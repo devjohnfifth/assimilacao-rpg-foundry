@@ -3,7 +3,7 @@
 Sistema em desenvolvimento para jogar **Assimilação RPG** (Editora Assimilar) no Foundry VTT v13+ (testado na v14).
 A especificação completa, capítulo por capítulo, está em [`docs/`](docs/).
 
-## O que já funciona (v0.1.0)
+## O que já funciona (v0.1.1)
 
 - **Dados de símbolos** ■ d6, ◆ d10 e ⬟ d12 (`dq`, `dl`, `dp`), com as faces do livro (p. 35 e 43):
   Sucesso, Adaptação e Pressão. Modificadores `sim`, `sa`, `sb`, `sc` para contar símbolos (ex.: `3dlsim` = dano).
@@ -14,7 +14,7 @@ A especificação completa, capítulo por capítulo, está em [`docs/`](docs/).
 - **Ficha de Infectado(a)** no visual da ficha oficial: Aptidões, Saúde em seis níveis com gotas,
   Cabo de Guerra com os 10 laços, Características, Assimilações por naipe, Inventário e notas.
 - **Itens**: Característica, Equipamento e Mutação.
-- **Dice So Nice**: dados cor de osso com os ícones dos símbolos.
+- **Dice So Nice**: dados de petróleo marmorizado com os ícones brancos dos símbolos, como os dados oficiais de resina.
 - Fontes livres que lembram o livro (Barlow Semi Condensed, EB Garamond, Grape Nuts, Special Elite, Rock Salt).
 
 ## Próximos passos (roadmap da especificação, seção 24)
@@ -42,6 +42,18 @@ Depois crie um mundo com o sistema **Assimilação RPG**. As atualizações apar
 2. Rode `scripts/empacotar.ps1` para regerar `dist/assimilacao.zip`.
 3. Faça o commit e o push para `main` (GitHub Desktop). O Foundry de quem instalou pelo link
    vai oferecer a atualização, porque o manifesto aponta para o `system.json` da `main`.
+
+## Testes automáticos
+
+Como GM, num mundo de teste, rode no console (F12) ou numa macro:
+
+```js
+game.assimilacao.testar()
+```
+
+A suíte cria um ator e mensagens temporários, verifica regras, ficha, diálogo de teste, card do chat,
+itens, temas claro e escuro, Dice So Nice, chaves de idioma e erros no console, apaga o que criou e
+publica o relatório no chat e no diário "Relatório de testes — Assimilação".
 
 ## Macros
 

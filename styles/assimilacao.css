@@ -96,26 +96,68 @@
 
 .application.assimilacao .window-content { padding: 10px 14px; }
 
-.application.assimilacao input[type="text"],
-.application.assimilacao input[type="number"],
-.application.assimilacao select {
-  font-family: var(--asm-fonte-texto);
-  font-size: 1rem;
+/* Campos: o tema escuro do Foundry define as cores direto em cada input; aqui elas voltam a ser tinta sobre papel. */
+.application.assimilacao .window-content input,
+.application.assimilacao .window-content select,
+.application.assimilacao .window-content textarea {
+  --input-background-color: rgba(255, 255, 255, .7);
+  --input-border-color: var(--asm-linha);
+  --input-text-color: var(--asm-tinta);
+  --input-focus-text-color: var(--asm-tinta);
+  --input-placeholder-color: #857b70;
+  --input-focus-outline-color: var(--asm-petroleo);
   color: var(--asm-tinta);
 }
+.application.assimilacao .window-content input:focus,
+.application.assimilacao .window-content select:focus,
+.application.assimilacao .window-content textarea:focus { --input-text-color: var(--asm-tinta); background-color: #fff; }
+.application.assimilacao .window-content input:disabled,
+.application.assimilacao .window-content select:disabled {
+  --input-background-color: rgba(234, 222, 198, .7);
+  --input-text-color: var(--asm-grafite);
+}
+.application.assimilacao .window-content input[type="text"],
+.application.assimilacao .window-content input[type="number"],
+.application.assimilacao .window-content select {
+  font-family: var(--asm-fonte-texto);
+  font-size: 1rem;
+  background-color: var(--input-background-color);
+  border: 1px solid var(--input-border-color);
+  color: var(--asm-tinta);
+}
+.application.assimilacao .window-content select option { color: var(--asm-tinta); background: var(--asm-papel-claro); }
+.application.assimilacao .window-content input[type="checkbox"] {
+  --checkbox-background-color: rgba(255, 255, 255, .85);
+  --checkbox-checked-color: var(--asm-vinho);
+  --checkbox-checkmark-color: #fff;
+  --checkbox-disabled-color: var(--asm-mancha);
+  --checkbox-size: 18px;
+  outline: 1.5px solid var(--asm-linha);
+  outline-offset: -1px;
+  border-radius: 3px;
+}
+.application.assimilacao .window-content label,
+.application.assimilacao .window-content legend { color: var(--asm-tinta); }
 
-.application.assimilacao button {
+.application.assimilacao .window-content button,
+.asm-card button {
   font-family: var(--asm-fonte-titulo);
   font-weight: 600;
   letter-spacing: .02em;
-  background: rgba(255, 255, 255, .45);
+  background: rgba(255, 255, 255, .7);
   color: var(--asm-tinta);
   border: 1px solid var(--asm-linha);
 }
-.application.assimilacao button:hover:not(:disabled) { background: var(--asm-papel-sombra); box-shadow: 0 0 0 1px var(--asm-kraft); }
-.application.assimilacao button.primario,
+.application.assimilacao .window-content button:hover:not(:disabled),
+.asm-card button:hover:not(:disabled) { background: var(--asm-papel-sombra); color: var(--asm-tinta); box-shadow: 0 0 0 1px var(--asm-kraft); }
+.application.assimilacao .window-content button.primario,
 .asm-card button.primario { background: var(--asm-vinho); color: #fff; border-color: var(--asm-vinho); }
-.application.assimilacao button.primario:hover:not(:disabled) { background: var(--asm-determinacao); }
+.application.assimilacao .window-content button.primario:hover:not(:disabled),
+.asm-card button.primario:hover:not(:disabled) { background: var(--asm-determinacao); color: #fff; }
+.application.assimilacao .window-content button:disabled { opacity: .5; }
+
+/* Botões da barra de título continuam com os ícones do Foundry */
+.application.assimilacao .window-header button.header-control { color: var(--asm-osso); background: transparent; border: none; }
 
 .asm-nota { font-size: .92rem; margin: .3rem 0; }
 .manuscrita, .asm-nota.manuscrita { font-family: var(--asm-fonte-mao); font-size: 1.08rem; color: #3a3330; }
@@ -146,6 +188,8 @@
    Ficha de Infectado
    ========================================================================== */
 .application.ficha-infectado .window-content {
+  container-type: inline-size;
+  container-name: ficha;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -200,13 +244,16 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
   white-space: nowrap; font-size: .95rem; padding-bottom: 3px;
 }
 .asm-campo.sem-rotulo > span { min-width: 0; }
-.asm-campo input[type="text"], .asm-campo input[type="number"], .asm-campo select {
+.application.assimilacao .window-content .asm-campo input[type="text"],
+.application.assimilacao .window-content .asm-campo input[type="number"],
+.application.assimilacao .window-content .asm-campo select {
   flex: 1; border: none; background: transparent; box-shadow: none; height: 26px; padding: 0 2px;
   font-family: var(--asm-fonte-mao); font-size: 1.15rem; color: #2b2626;
 }
-.asm-campo input:focus, .asm-campo select:focus { background: rgba(255, 255, 255, .5); outline: none; box-shadow: none; }
+.application.assimilacao .window-content .asm-campo input:focus,
+.application.assimilacao .window-content .asm-campo select:focus { background: rgba(255, 255, 255, .5); outline: none; box-shadow: none; }
 .asm-campo input[type="checkbox"] { flex: 0 0 auto; margin: 0 0 4px; }
-.asm-campo.nome input { font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1.6rem; letter-spacing: .02em; height: 34px; }
+.application.assimilacao .window-content .asm-campo.nome input { font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1.6rem; letter-spacing: .02em; height: 34px; }
 .asm-campo.curto { flex: 0 0 96px; }
 .asm-campo.curto input { width: 40px; }
 .asm-subtitulo { font-family: var(--asm-fonte-titulo); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--asm-grafite); margin-top: 4px; }
@@ -232,7 +279,17 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-acoes-rapidas { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 2px; }
 .asm-acoes-rapidas button { flex: 0 0 auto; font-size: .85rem; padding: 2px 10px; height: 28px; }
 
-.asm-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.asm-colunas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+
+/* Ficha estreita (tablet, janela pequena): colunas empilhadas */
+@container ficha (max-width: 700px) {
+  .asm-colunas { grid-template-columns: minmax(0, 1fr); }
+  .asm-cabecalho { grid-template-columns: 110px minmax(0, 1fr); }
+  .asm-retrato > img { width: 104px; height: 112px; }
+  .asm-linha-dupla { flex-wrap: wrap; }
+  .asm-caracteristicas { grid-template-columns: minmax(0, 1fr); }
+  .asm-cabo-circulo { flex-basis: 52px; height: 52px; }
+}
 
 .asm-titulo-secao {
   font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1.7rem; letter-spacing: .04em;
@@ -250,19 +307,20 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-titulo-grupo.conhecimentos, .asm-titulo-grupo.praticas { color: #84847e; }
 
 /* Grade de Aptidões (3 × 2 como na ficha) */
-.asm-grade { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--asm-instinto); background: rgba(255, 255, 255, .4); }
+.asm-grade { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 2px solid var(--asm-instinto); background: rgba(255, 255, 255, .4); }
 .asm-grade.conhecimentos, .asm-grade.praticas { border-color: var(--asm-terracota); }
 .asm-aptidao { display: flex; flex-direction: column; border: 1px solid rgba(255, 255, 255, .5); }
 .asm-aptidao-nome {
   display: block; text-align: center; color: #fff; padding: 3px 2px;
   font-family: var(--asm-fonte-titulo); font-weight: 600; font-size: .98rem; letter-spacing: .02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   background: var(--asm-instinto);
   background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .05) 0 2px, transparent 2px 9px);
   cursor: pointer;
 }
 .asm-aptidao.conhecimentos .asm-aptidao-nome, .asm-aptidao.praticas .asm-aptidao-nome { background-color: var(--asm-terracota); background-image: none; }
 .asm-aptidao-nome:hover { text-shadow: 0 0 6px rgba(255, 255, 255, .8); filter: brightness(1.12); }
-.asm-caixas { display: flex; justify-content: center; gap: 3px; padding: 5px 2px; background: var(--asm-papel-claro); }
+.asm-caixas { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; padding: 5px 2px; background: var(--asm-papel-claro); }
 .asm-caixa {
   width: 14px; height: 14px; border: 1.6px solid var(--asm-vinho); background: #fff; cursor: pointer; flex: 0 0 auto;
 }
@@ -278,7 +336,7 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
   background: var(--asm-papel-sombra); border: 1px solid var(--asm-linha); padding: 1px 4px;
 }
 .asm-saude-bloco.critica .asm-saude-regra { background: #fff; }
-.asm-saude-par { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.asm-saude-par { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
 .asm-faixa-cab {
   display: flex; align-items: center; gap: 8px; color: #fff; padding: 4px 8px;
   font-family: var(--asm-fonte-titulo); font-weight: 600; font-size: 1.05rem;
@@ -303,7 +361,7 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-saude-nota {
   margin: 2px 0 0; text-align: center; font-size: .78rem; font-family: var(--asm-fonte-titulo); color: var(--asm-tinta);
 }
-.asm-saude-notas-par { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.asm-saude-notas-par { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; }
 .asm-saude-bloco.critica .asm-saude-nota { background: var(--asm-vinho); color: #fff; padding: 4px; }
 .asm-saude-resumo {
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px;
@@ -361,7 +419,7 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-faixa-pincel.kraft { background: var(--asm-kraft); }
 .asm-faixa-pincel .asm-add { color: #fff; font-size: .85rem; }
 
-.asm-caracteristicas { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
+.asm-caracteristicas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 18px; }
 .asm-carac { border-bottom: 1.5px solid rgba(108, 36, 30, .5); padding-bottom: 3px; }
 .asm-carac header { display: flex; align-items: center; gap: 6px; }
 .asm-carac-nome {
@@ -469,6 +527,7 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-botoes { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 6px 0 2px; }
 .asm-card .asm-botoes button { flex: 1 1 auto; font-family: var(--asm-fonte-titulo); font-weight: 600; font-size: .85rem; line-height: 1.6; padding: 0 8px; }
 .asm-botoes.gm button { background: var(--asm-ardosia); color: #fff; border-color: var(--asm-ardosia); }
+.asm-card .asm-botoes.gm button:hover:not(:disabled) { background: var(--asm-assimilacao); color: #fff; }
 
 .asm-resultado { display: flex; justify-content: center; gap: 16px; margin: 8px 0 4px; padding: 4px; background: rgba(255, 255, 255, .5); border-top: 1px solid var(--asm-linha); border-bottom: 1px solid var(--asm-linha); }
 .asm-res-item { display: flex; align-items: center; gap: 4px; }
@@ -509,7 +568,7 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 .asm-item-cabecalho { display: flex; gap: 10px; align-items: center; }
 .asm-item-cabecalho img { width: 64px; height: 64px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); cursor: pointer; background: var(--asm-papel-sombra); }
 .asm-item-cabecalho > div { flex: 1; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
-.asm-item-nome { font-family: var(--asm-fonte-titulo) !important; font-weight: 700; font-size: 1.4rem !important; height: 34px; border: none; border-bottom: 1.5px solid var(--asm-linha); background: transparent; }
+.application.assimilacao .window-content .asm-item-nome { font-family: var(--asm-fonte-titulo) !important; font-weight: 700; font-size: 1.4rem !important; height: 34px; border: none; border-bottom: 1.5px solid var(--asm-linha); background: transparent; }
 .asm-item-campos .form-group label { font-family: var(--asm-fonte-titulo); font-weight: 600; }
 .asm-usos-campos { border: 1.5px solid var(--asm-linha); padding: 4px 8px; }
 .asm-usos-campos legend { font-family: var(--asm-fonte-etiqueta); color: var(--asm-vinho); font-size: .8rem; }

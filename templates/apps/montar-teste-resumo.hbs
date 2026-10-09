@@ -1,0 +1,14 @@
+<div class="asm-teste-resumo">
+  <div class="asm-resumo" aria-live="polite">
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.pool"}}</span> <strong class="asm-pool">{{calc.pool}}</strong></div>
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.mantidos"}}</span>
+      <strong>{{#if (eq calc.manterMin calc.manterMax)}}{{calc.manterMin}}{{else}}{{calc.manterMin}}–{{calc.manterMax}}{{/if}}</strong></div>
+    {{#if (or calc.custoD calc.custoE)}}
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.custo"}}</span>
+      <strong>{{#if calc.custoD}}{{calc.custoD}} d{{/if}}{{#if (and calc.custoD calc.custoE)}} + {{/if}}{{#if calc.custoE}}{{calc.custoE}} e{{/if}}</strong></div>
+    {{/if}}
+    {{#if calc.penalidadeA}}<div class="penalidade">{{localize "ASSIMILACAO.Rolagem.penalidadeSaude" n=calc.penalidadeA}}</div>{{/if}}
+    {{#if calc.exigeBB}}<div class="penalidade">{{localize "ASSIMILACAO.Rolagem.exigeBB"}}</div>{{/if}}
+    {{#each calc.avisos}}<div class="aviso">{{this}}</div>{{/each}}
+  </div>
+</div>

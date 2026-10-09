@@ -95,6 +95,11 @@ Hooks.once("init", () => {
   game.assimilacao = {
     RolagemAssimilacao, MontarTeste, executarTeste,
     dados: { DadoInstinto, DadoLosango, DadoAssimilado },
+    /** Roda a suíte de testes automáticos (GM). Ex.: game.assimilacao.testar() */
+    async testar(opcoes = {}) {
+      const { executar } = await import("./dev/testes.mjs");
+      return executar(opcoes);
+    },
     /** Rola uma fórmula de símbolos mantendo todos os dados. Ex.: rolar("3dl", {tipo: "dano"}) */
     async rolar(formula, opcoes = {}) {
       const roll = new RolagemAssimilacao(formula, {}, { tipo: "livre", autor: game.user.id, ...opcoes });

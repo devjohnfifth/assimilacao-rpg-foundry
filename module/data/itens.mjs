@@ -44,7 +44,10 @@ export class MutacaoData extends foundry.abstract.TypeDataModel {
   static LOCALIZATION_PREFIXES = ["ASSIMILACAO.Mutacao"];
   static defineSchema() {
     return {
-      naipe: new f.StringField({ required: true, initial: "copas", choices: () => CONFIG.ASSIMILACAO.NAIPES }),
+      naipe: new f.StringField({
+        required: true, initial: "copas",
+        choices: () => Object.fromEntries(Object.entries(CONFIG.ASSIMILACAO.NAIPES).map(([k, v]) => [k, v.rotulo]))
+      }),
       carta: texto(),
       aspecto: texto(),
       custo: texto(),

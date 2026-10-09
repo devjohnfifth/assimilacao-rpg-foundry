@@ -39,8 +39,14 @@ export class MontarTeste extends HandlebarsApplicationMixin(ApplicationV2) {
     actions: { cancelar: MontarTeste.#aoCancelar }
   };
 
+  /**
+   * Três partes: os campos só são redesenhados quando o tipo de teste muda;
+   * o resumo é redesenhado a cada mudança; o rodapé nunca (o clique em Rolar não pode cair num botão substituído).
+   */
   static PARTS = {
-    form: { template: "systems/assimilacao/templates/apps/montar-teste.hbs" }
+    campos: { template: "systems/assimilacao/templates/apps/montar-teste-campos.hbs" },
+    resumo: { template: "systems/assimilacao/templates/apps/montar-teste-resumo.hbs" },
+    rodape: { template: "systems/assimilacao/templates/apps/montar-teste-rodape.hbs" }
   };
 
   get title() {
@@ -143,25 +149,39 @@ export class MontarTeste extends HandlebarsApplicationMixin(ApplicationV2) {
     };
   }
 
-  /** Atualiza o estado e o resumo a cada mudança no formulário. */
+  /**
+   * Atualiza o estado a cada mudança no formulário.
+   * Texto livre (intenção) não redesenha nada; trocar o tipo de teste redesenha os campos;
+   * o resto só atualiza o resumo, preservando o foco e o clique no botão Rolar.
+   */
   _onChangeForm(formConfig, event) {
     super._onChangeForm(formConfig, event);
     const fd = new foundry.applications.ux.FormDataExtended(this.element);
+    const modoAntes = this.estado.modo;
     Object.assign(this.estado, fd.object);
-    this.render({ parts: ["form"] });
+    const campo = event.target?.name;
+    if ( campo === "intencao" ) return;
+    const partes = (this.estado.modo !== modoAntes) ? ["campos", "resumo"] : ["resumo"];
+    this.render({ parts: partes });
   }
 
   static async #aoEnviar(event, form, formData) {
+    if ( this._rolando ) return;
     Object.assign(this.estado, formData.object);
     const calc = this.calcular();
     if ( !calc.podeRolar ) {
       ui.notifications.warn(calc.avisos.join(" ") || game.i18n.localize("ASSIMILACAO.Teste.naoPode"));
       return;
     }
-    const roll = await executarTeste(this.actor, this.estado, calc);
-    this._resolve?.(roll);
-    this._resolve = null;
-    await this.close();
+    this._rolando = true;
+    try {
+      const roll = await executarTeste(this.actor, this.estado, calc);
+      this._resolve?.(roll);
+      this._resolve = null;
+      await this.close();
+    } finally {
+      this._rolando = false;
+    }
   }
 
   static #aoCancelar() {
