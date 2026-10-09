@@ -1,0 +1,9 @@
+<div class="asm-aptidao {{grupo}}" data-tooltip="{{rotulo}} {{valor}} — {{adjetivo}}. {{descricao}}" data-tooltip-direction="UP">
+  <a class="asm-aptidao-nome" data-action="rolarAptidao" data-aptidao="{{chave}}">{{rotulo}}</a>
+  <div class="asm-caixas forma-{{forma}}">
+    {{#each caixas}}
+    <span class="asm-caixa {{#if marcada}}marcada{{/if}}" {{#if @root.editable}}data-action="definirNivel"{{/if}}
+          data-grupo="{{../grupo}}" data-chave="{{../chave}}" data-nivel="{{n}}" aria-label="{{n}}"></span>
+    {{/each}}
+  </div>
+</div>

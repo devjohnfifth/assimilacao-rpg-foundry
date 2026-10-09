@@ -1,0 +1,73 @@
+{
+  "id": "assimilacao",
+  "title": "Assimilação RPG",
+  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG (Editora Assimilar): dados de símbolos ■◆⬟, ficha de Infectado(a) no visual do livro, Cabo de Guerra, Saúde e Teste de Ação com escolha de dados mantidos. Baralhos, Partitura de Conflito e Refúgios em construção.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14.367"
+  },
+  "authors": [
+    {
+      "name": "Compêndio de mesa (não-oficial)",
+      "flags": {}
+    }
+  ],
+  "url": "https://github.com/devjohnfifth/assimilacao-rpg-foundry",
+  "manifest": "https://raw.githubusercontent.com/devjohnfifth/assimilacao-rpg-foundry/main/system.json",
+  "download": "https://raw.githubusercontent.com/devjohnfifth/assimilacao-rpg-foundry/main/dist/assimilacao.zip",
+  "bugs": "https://github.com/devjohnfifth/assimilacao-rpg-foundry/issues",
+  "readme": "https://github.com/devjohnfifth/assimilacao-rpg-foundry/blob/main/README.md",
+  "esmodules": [
+    "module/assimilacao.mjs"
+  ],
+  "styles": [
+    "styles/assimilacao.css"
+  ],
+  "languages": [
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "en",
+      "name": "Português (Brasil)",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "infectado": {
+        "htmlFields": [
+          "biografia",
+          "notas"
+        ]
+      }
+    },
+    "Item": {
+      "caracteristica": {
+        "htmlFields": [
+          "descricao"
+        ]
+      },
+      "equipamento": {
+        "htmlFields": [
+          "descricao"
+        ]
+      },
+      "mutacao": {
+        "htmlFields": [
+          "descricao"
+        ]
+      }
+    }
+  },
+  "primaryTokenAttribute": "saude",
+  "secondaryTokenAttribute": "determinacao",
+  "grid": {
+    "distance": 1.5,
+    "units": "m"
+  },
+  "socket": true
+}

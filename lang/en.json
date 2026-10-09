@@ -1,0 +1,367 @@
+{
+  "TYPES": {
+    "Actor": {
+      "infectado": "Infectado(a)"
+    },
+    "Item": {
+      "caracteristica": "Característica",
+      "equipamento": "Equipamento",
+      "mutacao": "Mutação"
+    }
+  },
+  "ASSIMILACAO": {
+    "Dado": {
+      "q": "■ d6 (Instinto)",
+      "l": "◆ d10 (Conhecimento/Prática)",
+      "p": "⬟ d12 (Assimilado)"
+    },
+    "Simbolo": {
+      "A": "Sucesso",
+      "B": "Adaptação",
+      "C": "Pressão",
+      "vazio": "Face vazia"
+    },
+    "Aptidao": {
+      "influencia": "Influência",
+      "percepcao": "Percepção",
+      "potencia": "Potência",
+      "reacao": "Reação",
+      "resolucao": "Resolução",
+      "sagacidade": "Sagacidade",
+      "biologia": "Biologia",
+      "erudicao": "Erudição",
+      "engenharia": "Engenharia",
+      "geografia": "Geografia",
+      "medicina": "Medicina",
+      "seguranca": "Segurança",
+      "armas": "Armas",
+      "atletismo": "Atletismo",
+      "expressao": "Expressão",
+      "furtividade": "Furtividade",
+      "manufaturas": "Manufaturas",
+      "sobrevivencia": "Sobrevivência"
+    },
+    "AptidaoDesc": {
+      "influencia": "Carisma, palavras, liderança, intimidação, credibilidade; como os outros percebem você.",
+      "percepcao": "Sentidos e atenção: nuances, detalhes, longas distâncias, odores, pontaria; base de toda detecção.",
+      "potencia": "Força física, resistir a pressões externas, movimentos explosivos. Entra no cálculo de Saúde.",
+      "reacao": "Velocidade e precisão de reflexos; agir sem preparo; desviar; 1ª rodada de Conflito.",
+      "resolucao": "Resistência física e mental; resistir a intimidação, perdas, impulsos, ferimentos, veneno. Entra no cálculo de Saúde.",
+      "sagacidade": "Entender, interpretar, deduzir; astúcia e inteligência em qualquer tarefa.",
+      "biologia": "Vida, fauna, flora, corpo humano, química orgânica.",
+      "erudicao": "História, culturas, artes, política, filosofia, psicologia; saúde mental; costumes.",
+      "engenharia": "Matemática, física, química inorgânica; projetar, construir e manter estruturas e máquinas.",
+      "geografia": "Mapas, climas, ecossistemas, relevo, recursos naturais, orientação.",
+      "medicina": "Saúde humana e veterinária: diagnóstico, cirurgia, remédios, reabilitação.",
+      "seguranca": "Avaliação de riscos, manutenção preventiva, barreiras, alarmes, armadilhas, rotinas.",
+      "armas": "Armas brancas e de fogo: técnica, precisão, manutenção, adaptação.",
+      "atletismo": "Condicionamento: corrida, salto, natação, força, agilidade, resistência.",
+      "expressao": "Comunicação e arte: oratória, escrita, música, dança.",
+      "furtividade": "Mover-se em silêncio, passar despercebido, esconder objetos, camuflagem, infiltração.",
+      "manufaturas": "Criar, reparar e modificar objetos, ferramentas e estruturas.",
+      "sobrevivencia": "Ambientes hostis: caça, pesca, abrigo, água e fogo, perigos naturais."
+    },
+    "Grupo": {
+      "instintos": "Instintos",
+      "conhecimentos": "Conhecimentos",
+      "praticas": "Práticas"
+    },
+    "Geracao": {
+      "pre": "Pré-Colapso",
+      "colapso": "Geração-Colapso",
+      "pos": "Pós-Colapso"
+    },
+    "Naipe": {
+      "copas": "♥ Evolutivas",
+      "ouros": "♦ Adaptativas",
+      "espadas": "♠ Inoportunas",
+      "paus": "♣ Singulares"
+    },
+    "Inventario": {
+      "corpo": "Corpo",
+      "mochila": "Mochila",
+      "refugio": "Refúgio"
+    },
+    "Escopo": {
+      "rodada": "Por rodada",
+      "cena": "Por cena",
+      "repouso": "Por repouso",
+      "dia": "Por dia",
+      "semana": "Por semana",
+      "sessao": "Por sessão",
+      "arco": "Por arco",
+      "livre": "Livre"
+    },
+    "Abas": {
+      "frente": "Ficha",
+      "verso": "Verso",
+      "notas": "Notas"
+    },
+    "Origens": {
+      "titulo": "Origens",
+      "eventoMarcante": "Evento Marcante",
+      "ocupacao": "Ocupação",
+      "usada": "usada",
+      "usadaDica": "Usada nesta sessão (+1 dado mantido, uma vez por sessão)"
+    },
+    "Propositos": {
+      "pessoais": "Propósitos Pessoais",
+      "coletivo": "Propósito Coletivo"
+    },
+    "Estado": {
+      "suscetivel": "Suscetível",
+      "mutacaoPendente": "Mutação pendente",
+      "morto": "Morto(a)",
+      "inconsciente": "Inconsciente",
+      "ferido": "Ferido(a)"
+    },
+    "Ficha": {
+      "rotuloFicha": "Ficha de Infectado(a)",
+      "rotuloItem": "Item do Assimilação",
+      "retrato": "Clique para trocar o retrato",
+      "nome": "Nome",
+      "geracao": "Geração",
+      "idade": "Idade",
+      "conceito": "Conceito",
+      "conceitoDica": "Quem você quer viver?",
+      "testeLivre": "Teste",
+      "encerrarCena": "Fim de cena",
+      "encerrarCenaDica": "Recupera todos os pontos de Assimilação (e).",
+      "repouso": "Repouso completo",
+      "repousoDica": "Recupera 1 + Resolução d e todos os e; regenera Saúde nos níveis 6 e 5.",
+      "novaSessao": "Nova sessão",
+      "novaSessaoDica": "Libera de novo o uso das Origens.",
+      "aptidoes": "Aptidões",
+      "caracteristicas": "Características",
+      "adicionar": "Adicionar",
+      "usosDica": "Clique para gastar um uso",
+      "mostrar": "Mostrar no chat",
+      "remover": "Remover",
+      "semCaracteristicas": "Nenhuma Característica ainda.",
+      "assimilacoes": "Assimilações",
+      "cInoportunasDica": "C acumuladas pelas Assimilações Inoportunas. Com 10, o personagem é perdido.",
+      "cNeutralizadas": "neutralizadas",
+      "inventario": "Espaços de Inventário",
+      "biografia": "Biografia",
+      "anotacoes": "Anotações",
+      "progressao": "Progressão",
+      "xpTotal": "Experiência",
+      "xpGasta": "Gasta",
+      "xpDisponivel": "Disponível",
+      "cicatrizes": "Cicatrizes emocionais",
+      "cicatrizesDica": "abalo, paranoia, cólera…"
+    },
+    "Saude": {
+      "titulo": "Saúde",
+      "formula": "1 + Potência + Resolução",
+      "morto": "Morto(a)",
+      "regraAlta": "Ativa Recuperação após cada repouso completo",
+      "regraMedia": "Ativa a Recuperação após uma semana",
+      "notaMedia": "Menos 1 Sucesso em todos os testes",
+      "regraCritica": "Dano dessa gravidade não regenera naturalmente. Será necessário tratamento médico",
+      "nota2": "Incapaz de agir, mas mantém a consciência. Menos 2 Sucessos em todos os testes.",
+      "nota1": "Inconsciente. Qualquer Ação com teste exige 2 Adaptações para ativar.",
+      "estado": "Estado",
+      "temporarios": "Temporários",
+      "temporariosDica": "Pontos temporários (ex.: Adrenalina) caem antes dos pontos reais.",
+      "dano": "Dano",
+      "curar": "Curar",
+      "aplicarDano": "Aplicar dano",
+      "pontos": "Pontos de Saúde"
+    },
+    "Cabo": {
+      "determinacao": "Determinação",
+      "assimilacao": "Assimilação",
+      "nivelD": "Nível de Determinação (D) e pontos disponíveis (d)",
+      "nivelE": "Nível de Assimilação (E = 10 − D) e pontos disponíveis (e)",
+      "subirD": "Subir D (Clareza de Propósito)",
+      "descerD": "Baixar D",
+      "lacoD": "Ponto de Determinação: clique para gastar ou recuperar",
+      "lacoE": "Ponto de Assimilação: clique para gastar ou recuperar",
+      "perdeuNivelTitulo": "O parasita avança",
+      "perdeuNivel": "{nome} perdeu um nível de Determinação: agora D {D} / E {E}. Faça o Teste de Assimilação e o Processo de Mutação; a nova reserva de d fica travada até lá."
+    },
+    "Teste": {
+      "titulo": "Montar Teste",
+      "modo": "Tipo de teste",
+      "modoAptidao": "Instinto + Conhecimento ou Prática",
+      "modoAssimilada": "Agir por Instinto (Rolagem Assimilada)",
+      "instinto": "Instinto",
+      "instinto2": "Segundo Instinto",
+      "aptidao": "Conhecimento ou Prática",
+      "semAptidao": "— nenhum (só o Instinto) —",
+      "dicaAssimilada": "Rola (Instinto 1 + Instinto 2) dados ⬟ e mantém 1 a mais. Custa 1 e (ou 2 d). Não pode receber Apoiar/Ajudar Aliado nem usar B para anular C em Ação Simples.",
+      "antesDeRolar": "Decida antes de rolar",
+      "empenho": "Empenho (1 d: +1 dado mantido)",
+      "emConflito": "Em Conflito",
+      "bonus": "Bônus do(a) Assimilador(a), equipamentos e Características",
+      "manterExtra": "+ mantidos",
+      "intencao": "Intenção",
+      "intencaoDica": "O que você quer conseguir?",
+      "pool": "Dados",
+      "mantidos": "Dados mantidos",
+      "custo": "Custo",
+      "rolar": "Rolar",
+      "semD": "Pontos de Determinação insuficientes.",
+      "suscetivel": "Suscetível: não pode gastar d.",
+      "dTravado": "A nova reserva de d está travada até concluir a mutação.",
+      "semDados": "Nenhum dado para rolar.",
+      "naoPode": "Não é possível rolar este teste.",
+      "tagInstinto": "instinto",
+      "tagAptidao": "aptidão",
+      "tagAssimilada": "assimilada",
+      "tagExtra": "extra"
+    },
+    "Rolagem": {
+      "titulo": "Rolagem",
+      "privada": "Rolagem privada.",
+      "emConflito": "Conflito",
+      "face": "face",
+      "tipo": {
+        "acao": "Teste de Ação",
+        "assimilada": "Rolagem Assimilada",
+        "dano": "Dano",
+        "assimilacao": "Teste de Assimilação",
+        "livre": "Rolagem"
+      },
+      "escolha": "Escolha os dados mantidos: {min}–{max} (selecionados: {sel}).",
+      "sugerir": "Sugerir",
+      "confirmar": "Manter",
+      "pontosDano": "pontos de dano",
+      "penalidadeSaude": "Penalidade de Saúde: −{n} Sucesso(s).",
+      "penalidadeIgnorada": "{n} ignorada(s) com Adaptação",
+      "exigeBB": "Incapacitação: a ação só ativa com 2 Adaptações.",
+      "bbPago": "2 Adaptações gastas: a ação ativa.",
+      "bAnulou": "{n} Adaptação(ões) anularam Pressão.",
+      "usarBAnulaC": "Gastar 1 Adaptação: anular 1 Pressão",
+      "usarBPenalidade": "Gastar 1 Adaptação: ignorar penalidade",
+      "usarBB": "Gastar 2 Adaptações: ativar",
+      "cParaGM": "{n} Pressão para o(a) Assimilador(a).",
+      "escala": "escala",
+      "cAbateuD": "{n} Pressão abateu Determinação.",
+      "gmAbaterD": "Pressão: −1 d",
+      "gmReverter": "Reverter ajustes"
+    },
+    "Avisos": {
+      "semAtor": "Personagem da rolagem não encontrado.",
+      "naoDono": "Só quem rolou (ou o(a) Assimilador(a)) pode escolher os dados.",
+      "maxMantidos": "Você só pode manter {max} dado(s).",
+      "qtdMantidos": "Mantenha entre {min} e {max} dado(s)."
+    },
+    "Config": {
+      "tetoMantidos": "Teto de dados mantidos",
+      "tetoMantidosDica": "Via de regra, no máximo 4 dados mantidos por teste (p. 57).",
+      "ornamentos": "Ornamentos da ficha",
+      "ornamentosDica": "Mostra os galhos e manchas decorativas nas fichas. Desligue em máquinas mais fracas."
+    },
+    "Item": {
+      "usos": "Usos",
+      "descricao": "Descrição"
+    },
+    "Caracteristica": {
+      "FIELDS": {
+        "custo": {
+          "label": "Custo (Experiência)"
+        },
+        "requisitos": {
+          "label": "Requisitos"
+        },
+        "usos": {
+          "value": {
+            "label": "Usos restantes"
+          },
+          "max": {
+            "label": "Usos máximos"
+          },
+          "escopo": {
+            "label": "Renovação"
+          }
+        },
+        "descricao": {
+          "label": "Descrição"
+        }
+      }
+    },
+    "Equipamento": {
+      "resumo": "Qualidade · Escassez",
+      "FIELDS": {
+        "escassez": {
+          "label": "Escassez",
+          "hint": "Dificuldade de obter (0 a 6; Artefatos somam suas características)."
+        },
+        "qualidade": {
+          "label": "Qualidade",
+          "hint": "0 a 6. Cai com Pressão investida no equipamento."
+        },
+        "cInvestidas": {
+          "label": "Pressão acumulada",
+          "hint": "C já investidas para a próxima queda de Qualidade."
+        },
+        "local": {
+          "label": "Onde está"
+        },
+        "espacos": {
+          "label": "Espaços ocupados",
+          "hint": "Pesado ocupa 2; Discreto ocupa 0."
+        },
+        "artefato": {
+          "label": "Artefato"
+        },
+        "caracteristicas": {
+          "label": "Características"
+        },
+        "usos": {
+          "value": {
+            "label": "Usos restantes"
+          },
+          "max": {
+            "label": "Usos máximos"
+          },
+          "escopo": {
+            "label": "Renovação"
+          }
+        },
+        "descricao": {
+          "label": "Descrição"
+        }
+      }
+    },
+    "Mutacao": {
+      "FIELDS": {
+        "naipe": {
+          "label": "Categoria (naipe)"
+        },
+        "carta": {
+          "label": "Carta"
+        },
+        "aspecto": {
+          "label": "Aspecto"
+        },
+        "custo": {
+          "label": "Custo de aquisição",
+          "hint": "Símbolos pagos com o Teste de Assimilação, ex.: AB ou CC."
+        },
+        "requisitoE": {
+          "label": "Requisito de Assimilação (E)"
+        },
+        "cPressao": {
+          "label": "Pressão (Inoportunas)"
+        },
+        "usos": {
+          "value": {
+            "label": "Usos restantes"
+          },
+          "max": {
+            "label": "Usos máximos"
+          },
+          "escopo": {
+            "label": "Renovação"
+          }
+        },
+        "descricao": {
+          "label": "Descrição"
+        }
+      }
+    }
+  }
+}

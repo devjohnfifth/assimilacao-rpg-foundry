@@ -1,0 +1,6 @@
+node_modules/
+packs/*/
+!packs/_source/
+*.log
+.DS_Store
+docs/

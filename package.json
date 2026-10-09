@@ -1,0 +1,10 @@
+{
+  "name": "assimilacao-rpg",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG.",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check.mjs"
+  }
+}

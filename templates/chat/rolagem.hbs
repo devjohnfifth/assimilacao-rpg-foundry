@@ -1,0 +1,102 @@
+<div class="asm-card asm-papel tipo-{{tipo}}">
+  <header class="asm-card-cabecalho">
+    {{#if ator.img}}<img class="asm-card-retrato" src="{{ator.img}}" alt="">{{/if}}
+    <div class="asm-card-titulos">
+      <span class="asm-etiqueta">{{tipoRotulo}}</span>
+      <h3>{{titulo}}</h3>
+      {{#if pool}}<span class="asm-card-pool">{{pool}}</span>{{/if}}
+    </div>
+  </header>
+
+  {{#if isPrivate}}
+  <p class="asm-card-privado">{{localize "ASSIMILACAO.Rolagem.privada"}}</p>
+  {{else}}
+
+  {{#if intencao}}<p class="asm-card-intencao">“{{intencao}}”</p>{{/if}}
+
+  {{#if (or custos.d custos.e custos.origens.length emConflito)}}
+  <ul class="asm-card-tags">
+    {{#if emConflito}}<li class="asm-tag conflito">{{localize "ASSIMILACAO.Rolagem.emConflito"}}</li>{{/if}}
+    {{#each custos.origens}}<li class="asm-tag origem">{{this}}</li>{{/each}}
+    {{#if custos.d}}<li class="asm-tag det">−{{custos.d}} d</li>{{/if}}
+    {{#if custos.e}}<li class="asm-tag ass">−{{custos.e}} e</li>{{/if}}
+  </ul>
+  {{/if}}
+
+  <ol class="asm-dados {{#if podeEscolher}}escolhendo{{/if}}">
+    {{#each dados}}
+    <li class="asm-dado-ficha forma-{{forma}} {{#if mantido}}mantido{{/if}} {{#if descartado}}descartado{{/if}}"
+        {{#if ../podeEscolher}}data-acao="alternar" data-indice="{{indice}}" role="button" tabindex="0"{{/if}}
+        data-tooltip="{{localize (concat "ASSIMILACAO.Dado." denom)}} — {{localize "ASSIMILACAO.Rolagem.face"}} {{face}}{{#if origem}} ({{origem}}){{/if}}">
+      <span class="asm-dado-forma"></span>
+      {{{html}}}
+    </li>
+    {{/each}}
+  </ol>
+
+  {{#if podeEscolher}}
+  <div class="asm-card-escolha">
+    <p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.escolha" min=min max=max sel=selecionados}}</p>
+    <div class="asm-botoes">
+      <button type="button" data-acao="sugerir"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "ASSIMILACAO.Rolagem.sugerir"}}</button>
+      <button type="button" data-acao="confirmar" class="primario"><i class="fa-solid fa-lock"></i> {{localize "ASSIMILACAO.Rolagem.confirmar"}}</button>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if mostrarResultado}}
+  {{#if ehDano}}
+  <div class="asm-resultado dano">
+    <span class="asm-resultado-num">{{totalDano}}</span>
+    <span>{{localize "ASSIMILACAO.Rolagem.pontosDano"}}</span>
+  </div>
+  {{else}}
+  <div class="asm-resultado">
+    <div class="asm-res-item A" data-tooltip="{{localize "ASSIMILACAO.Simbolo.A"}}">
+      <img src="{{simbolos.A.icone}}" alt="A"><span class="asm-resultado-num">{{res.A}}</span>
+    </div>
+    <div class="asm-res-item B" data-tooltip="{{localize "ASSIMILACAO.Simbolo.B"}}">
+      <img src="{{simbolos.B.icone}}" alt="B"><span class="asm-resultado-num">{{res.B}}</span>
+    </div>
+    <div class="asm-res-item C" data-tooltip="{{localize "ASSIMILACAO.Simbolo.C"}}">
+      <img src="{{simbolos.C.icone}}" alt="C"><span class="asm-resultado-num">{{res.C}}</span>
+    </div>
+  </div>
+
+  {{#if penalidadeA}}
+  <p class="asm-nota penalidade">
+    {{localize "ASSIMILACAO.Rolagem.penalidadeSaude" n=penalidadeA}}
+    {{#if ajustes.bIgnoraPen}} — {{localize "ASSIMILACAO.Rolagem.penalidadeIgnorada" n=ajustes.bIgnoraPen}}{{/if}}
+  </p>
+  {{/if}}
+  {{#if exigeBB}}
+  <p class="asm-nota penalidade">{{#if res.ativou}}{{localize "ASSIMILACAO.Rolagem.bbPago"}}{{else}}{{localize "ASSIMILACAO.Rolagem.exigeBB"}}{{/if}}</p>
+  {{/if}}
+  {{#if ajustes.bAnulaC}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.bAnulou" n=ajustes.bAnulaC}}</p>{{/if}}
+
+  {{#if podeAjustar}}
+  <div class="asm-botoes">
+    {{#if podeAnularC}}<button type="button" data-acao="b-anula-c">{{localize "ASSIMILACAO.Rolagem.usarBAnulaC"}}</button>{{/if}}
+    {{#if podeIgnorarPen}}<button type="button" data-acao="b-ignora-pen">{{localize "ASSIMILACAO.Rolagem.usarBPenalidade"}}</button>{{/if}}
+    {{#if podeAtivarBB}}<button type="button" data-acao="bb-ativa">{{localize "ASSIMILACAO.Rolagem.usarBB"}}</button>{{/if}}
+  </div>
+  {{/if}}
+
+  {{#if res.C}}
+  <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Rolagem.cParaGM" n=res.C}}{{#if consequencia}} <span class="asm-consequencia">({{localize "ASSIMILACAO.Rolagem.escala"}}: {{consequencia}})</span>{{/if}}</p>
+  {{/if}}
+  {{#if ajustes.cDeterminacao}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.cAbateuD" n=ajustes.cDeterminacao}}</p>{{/if}}
+  {{#if gmPodeAbaterD}}
+  <div class="asm-botoes gm">
+    <button type="button" data-acao="gm-c-det"><i class="fa-solid fa-heart-crack"></i> {{localize "ASSIMILACAO.Rolagem.gmAbaterD"}}</button>
+  </div>
+  {{/if}}
+  {{#if isGM}}{{#if (or ajustes.bAnulaC ajustes.bIgnoraPen ajustes.cDeterminacao)}}
+  <div class="asm-botoes gm">
+    <button type="button" data-acao="gm-reverter"><i class="fa-solid fa-rotate-left"></i> {{localize "ASSIMILACAO.Rolagem.gmReverter"}}</button>
+  </div>
+  {{/if}}{{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+</div>

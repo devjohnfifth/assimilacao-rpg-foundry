@@ -1,0 +1,79 @@
+<div class="asm-teste">
+  <div class="form-group">
+    <label>{{localize "ASSIMILACAO.Teste.modo"}}</label>
+    <select name="modo">{{selectOptions opModo selected=estado.modo}}</select>
+  </div>
+
+  <div class="form-group">
+    <label>■ {{localize "ASSIMILACAO.Teste.instinto"}}</label>
+    <select name="instinto">{{selectOptions opInst selected=estado.instinto}}</select>
+  </div>
+
+  {{#if calc.assimilada}}
+  <div class="form-group">
+    <label>⬟ {{localize "ASSIMILACAO.Teste.instinto2"}}</label>
+    <select name="instinto2">{{selectOptions opInst selected=estado.instinto2}}</select>
+  </div>
+  <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Teste.dicaAssimilada"}}</p>
+  {{else}}
+  <div class="form-group">
+    <label>◆ {{localize "ASSIMILACAO.Teste.aptidao"}}</label>
+    <select name="aptidao">{{selectOptions opApt selected=estado.aptidao}}</select>
+  </div>
+  {{/if}}
+
+  <fieldset class="asm-opcoes">
+    <legend>{{localize "ASSIMILACAO.Teste.antesDeRolar"}}</legend>
+    <label class="asm-check {{#if origens.eventoMarcante.usado}}usado{{/if}}">
+      <input type="checkbox" name="origemEvento" {{checked estado.origemEvento}} {{disabled origens.eventoMarcante.usado}}>
+      {{localize "ASSIMILACAO.Origens.eventoMarcante"}}{{#if origens.eventoMarcante.texto}}: <em>{{origens.eventoMarcante.texto}}</em>{{/if}}
+      {{#if origens.eventoMarcante.usado}}<span class="asm-tag">{{localize "ASSIMILACAO.Origens.usada"}}</span>{{/if}}
+    </label>
+    <label class="asm-check {{#if origens.ocupacao.usado}}usado{{/if}}">
+      <input type="checkbox" name="origemOcupacao" {{checked estado.origemOcupacao}} {{disabled origens.ocupacao.usado}}>
+      {{localize "ASSIMILACAO.Origens.ocupacao"}}{{#if origens.ocupacao.texto}}: <em>{{origens.ocupacao.texto}}</em>{{/if}}
+      {{#if origens.ocupacao.usado}}<span class="asm-tag">{{localize "ASSIMILACAO.Origens.usada"}}</span>{{/if}}
+    </label>
+    <label class="asm-check">
+      <input type="checkbox" name="empenho" {{checked estado.empenho}} {{disabled sys.suscetivel}}>
+      {{localize "ASSIMILACAO.Teste.empenho"}}
+    </label>
+    <label class="asm-check">
+      <input type="checkbox" name="emConflito" {{checked estado.emConflito}}>
+      {{localize "ASSIMILACAO.Teste.emConflito"}}
+    </label>
+  </fieldset>
+
+  <fieldset class="asm-opcoes extras">
+    <legend>{{localize "ASSIMILACAO.Teste.bonus"}}</legend>
+    <div class="asm-linha-extras">
+      <label>+■ <input type="number" name="extraQ" value="{{estado.extraQ}}" min="0" max="10" step="1"></label>
+      <label>+◆ <input type="number" name="extraL" value="{{estado.extraL}}" min="0" max="10" step="1"></label>
+      <label>+⬟ <input type="number" name="extraP" value="{{estado.extraP}}" min="0" max="10" step="1"></label>
+      <label>{{localize "ASSIMILACAO.Teste.manterExtra"}} <input type="number" name="manterExtra" value="{{estado.manterExtra}}" min="0" max="3" step="1"></label>
+    </div>
+  </fieldset>
+
+  <div class="form-group stacked">
+    <label>{{localize "ASSIMILACAO.Teste.intencao"}}</label>
+    <input type="text" name="intencao" value="{{estado.intencao}}" placeholder="{{localize "ASSIMILACAO.Teste.intencaoDica"}}">
+  </div>
+
+  <div class="asm-resumo">
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.pool"}}</span> <strong class="asm-pool">{{calc.pool}}</strong></div>
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.mantidos"}}</span>
+      <strong>{{#if (eq calc.manterMin calc.manterMax)}}{{calc.manterMin}}{{else}}{{calc.manterMin}}–{{calc.manterMax}}{{/if}}</strong></div>
+    {{#if (or calc.custoD calc.custoE)}}
+    <div><span class="rotulo">{{localize "ASSIMILACAO.Teste.custo"}}</span>
+      <strong>{{#if calc.custoD}}{{calc.custoD}} d{{/if}}{{#if (and calc.custoD calc.custoE)}} + {{/if}}{{#if calc.custoE}}{{calc.custoE}} e{{/if}}</strong></div>
+    {{/if}}
+    {{#if calc.penalidadeA}}<div class="penalidade">{{localize "ASSIMILACAO.Rolagem.penalidadeSaude" n=calc.penalidadeA}}</div>{{/if}}
+    {{#if calc.exigeBB}}<div class="penalidade">{{localize "ASSIMILACAO.Rolagem.exigeBB"}}</div>{{/if}}
+    {{#each calc.avisos}}<div class="aviso">{{this}}</div>{{/each}}
+  </div>
+
+  <footer class="asm-botoes">
+    <button type="button" data-action="cancelar">{{localize "Cancel"}}</button>
+    <button type="submit" class="primario" {{disabled (not calc.podeRolar)}}><i class="fa-solid fa-dice"></i> {{localize "ASSIMILACAO.Teste.rolar"}}</button>
+  </footer>
+</div>

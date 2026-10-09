@@ -1,0 +1,9 @@
+<div class="asm-faixa {{faixa}} {{#if atual}}atual{{/if}}">
+  <div class="asm-faixa-cab"><span class="asm-faixa-num">{{nivel}}</span><span class="asm-faixa-nome">{{nome}}</span></div>
+  <div class="asm-gotas">
+    {{#each gotas}}
+    <span class="asm-gota {{#if cheia}}cheia{{/if}} {{#if fixa}}fixa{{/if}}" {{#if @root.editable}}data-action="gota"{{/if}}
+          data-nivel="{{nivel}}" data-j="{{j}}" role="button" aria-pressed="{{cheia}}"></span>
+    {{/each}}
+  </div>
+</div>

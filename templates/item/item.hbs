@@ -1,0 +1,45 @@
+<div class="asm-item tipo-{{item.type}} {{#if naipe}}naipe-{{source.system.naipe}}{{/if}}">
+  <header class="asm-item-cabecalho">
+    <img src="{{item.img}}" data-action="editImage" data-edit="img" alt="">
+    <div>
+      <span class="asm-etiqueta">{{tipoRotulo}}</span>
+      <input class="asm-item-nome" type="text" name="name" value="{{item.name}}">
+    </div>
+  </header>
+
+  <div class="asm-item-campos">
+    {{#if ehCaracteristica}}
+      {{formGroup systemFields.custo value=source.system.custo}}
+      {{formGroup systemFields.requisitos value=source.system.requisitos}}
+    {{/if}}
+    {{#if ehEquipamento}}
+      {{formGroup systemFields.escassez value=source.system.escassez}}
+      {{formGroup systemFields.qualidade value=source.system.qualidade}}
+      {{formGroup systemFields.cInvestidas value=source.system.cInvestidas}}
+      {{formGroup systemFields.local value=source.system.local localize=true}}
+      {{formGroup systemFields.espacos value=source.system.espacos}}
+      {{formGroup systemFields.artefato value=source.system.artefato}}
+      {{formGroup systemFields.caracteristicas value=source.system.caracteristicas}}
+    {{/if}}
+    {{#if ehMutacao}}
+      {{formGroup systemFields.naipe value=source.system.naipe localize=true}}
+      {{formGroup systemFields.carta value=source.system.carta}}
+      {{formGroup systemFields.aspecto value=source.system.aspecto}}
+      {{formGroup systemFields.custo value=source.system.custo}}
+      {{formGroup systemFields.requisitoE value=source.system.requisitoE}}
+      {{formGroup systemFields.cPressao value=source.system.cPressao}}
+    {{/if}}
+    <fieldset class="asm-usos-campos">
+      <legend>{{localize "ASSIMILACAO.Item.usos"}}</legend>
+      {{formGroup systemFields.usos.fields.value value=source.system.usos.value}}
+      {{formGroup systemFields.usos.fields.max value=source.system.usos.max}}
+      {{formGroup systemFields.usos.fields.escopo value=source.system.usos.escopo localize=true}}
+    </fieldset>
+  </div>
+
+  <div class="asm-bloco-rasgado">
+    <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Item.descricao"}}</h2>
+    <prose-mirror name="system.descricao" value="{{source.system.descricao}}" toggled
+                  data-document-uuid="{{item.uuid}}">{{{descricaoHTML}}}</prose-mirror>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<section class="tab asm-verso {{tab.cssClass}}" data-group="primary" data-tab="verso">
+
+  {{!-- CARACTERÍSTICAS --}}
+  <h2 class="asm-faixa-pincel vinho">{{localize "ASSIMILACAO.Ficha.caracteristicas"}}
+    {{#if editable}}<a class="asm-add" data-action="criarItem" data-tipo="caracteristica" data-tooltip="{{localize "ASSIMILACAO.Ficha.adicionar"}}"><i class="fa-solid fa-plus"></i></a>{{/if}}
+  </h2>
+  <div class="asm-caracteristicas">
+    {{#each caracteristicas}}
+    <article class="asm-carac" data-item-id="{{id}}">
+      <header>
+        <span class="asm-carac-nome" data-action="editarItem">{{name}}</span>
+        <span class="asm-carac-custo" data-tooltip="{{localize "ASSIMILACAO.Caracteristica.FIELDS.custo.label"}}">{{system.custo}}</span>
+        {{#if system.usos.max}}
+        <span class="asm-usos" data-action="usarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.usosDica"}}">{{system.usos.value}}/{{system.usos.max}}</span>
+        {{/if}}
+        <span class="asm-item-controles">
+          <a data-action="mostrarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.mostrar"}}"><i class="fa-solid fa-comment"></i></a>
+          {{#if @root.editable}}<a data-action="apagarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.remover"}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+        </span>
+      </header>
+      {{#if system.requisitos}}<p class="asm-requisitos">{{system.requisitos}}</p>{{/if}}
+    </article>
+    {{else}}
+    <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Ficha.semCaracteristicas"}}</p>
+    {{/each}}
+  </div>
+
+  <div class="asm-colunas verso">
+    {{!-- ASSIMILAÇÕES --}}
+    <div class="asm-assimilacoes">
+      <h2 class="asm-faixa-pincel petroleo">{{localize "ASSIMILACAO.Ficha.assimilacoes"}}</h2>
+      {{#each mutacoes}}
+      <div class="asm-naipe naipe-{{naipe}}">
+        <div class="asm-naipe-lista">
+          {{#each itens}}
+          <div class="asm-mutacao" data-item-id="{{id}}">
+            <span class="asm-mutacao-nome" data-action="editarItem">{{name}}</span>
+            {{#if system.aspecto}}<span class="asm-mutacao-aspecto">{{system.aspecto}}</span>{{/if}}
+            {{#if system.usos.max}}<span class="asm-usos" data-action="usarItem">{{system.usos.value}}/{{system.usos.max}}</span>{{/if}}
+            <span class="asm-item-controles">
+              <a data-action="mostrarItem"><i class="fa-solid fa-comment"></i></a>
+              {{#if @root.editable}}<a data-action="apagarItem"><i class="fa-solid fa-trash"></i></a>{{/if}}
+            </span>
+          </div>
+          {{/each}}
+          {{#if (eq naipe "espadas")}}
+          <div class="asm-inoportunas">
+            <label data-tooltip="{{localize "ASSIMILACAO.Ficha.cInoportunasDica"}}">C <input type="number" name="system.cInoportunas" value="{{@root.source.system.cInoportunas}}" min="0" max="10"> / 10</label>
+            <label>{{localize "ASSIMILACAO.Ficha.cNeutralizadas"}} <input type="number" name="system.cNeutralizadas" value="{{@root.source.system.cNeutralizadas}}" min="0" max="10"></label>
+          </div>
+          {{/if}}
+        </div>
+        <div class="asm-naipe-icones" data-tooltip="{{rotulo}}">
+          <img src="{{icone}}" alt="">
+          <span class="asm-naipe-glifo">{{glifo}}</span>
+          {{#if @root.editable}}<a class="asm-add" data-action="criarItem" data-tipo="mutacao" data-naipe="{{naipe}}"><i class="fa-solid fa-plus"></i></a>{{/if}}
+        </div>
+      </div>
+      {{/each}}
+      <label class="asm-check mutacao-pendente">
+        <input type="checkbox" name="system.mutacaoPendente" {{checked source.system.mutacaoPendente}}>
+        {{localize "ASSIMILACAO.Estado.mutacaoPendente"}}
+      </label>
+    </div>
+
+    {{!-- INVENTÁRIO --}}
+    <div class="asm-inventario">
+      <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Ficha.inventario"}}</h2>
+      {{#each inventario}}
+      <div class="asm-local local-{{local}}">
+        <h3>{{lookup @root.locais local}} <small>{{usados}}/{{cap}}</small>
+          {{#if @root.editable}}<a class="asm-add" data-action="criarItem" data-tipo="equipamento" data-local="{{local}}"><i class="fa-solid fa-plus"></i></a>{{/if}}
+        </h3>
+        <div class="asm-espacos {{#if excedido}}excedido{{/if}}">
+          {{#each caixas}}<span class="asm-espaco {{#if cheia}}cheia{{/if}} {{#if extra}}extra{{/if}}"></span>{{/each}}
+        </div>
+        <ul class="asm-itens">
+          {{#each itens}}
+          <li class="asm-equip" data-item-id="{{id}}">
+            <img src="{{img}}" alt="">
+            <span class="asm-equip-nome" data-action="editarItem">{{name}}</span>
+            <span class="asm-equip-dados" data-tooltip="{{localize "ASSIMILACAO.Equipamento.resumo"}}">Q{{system.qualidade}} · E{{system.escassez}}</span>
+            {{#if system.usos.max}}<span class="asm-usos" data-action="usarItem">{{system.usos.value}}/{{system.usos.max}}</span>{{/if}}
+            <span class="asm-item-controles">
+              <a data-action="mostrarItem"><i class="fa-solid fa-comment"></i></a>
+              {{#if @root.editable}}<a data-action="apagarItem"><i class="fa-solid fa-trash"></i></a>{{/if}}
+            </span>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/each}}
+      {{#if refugio.length}}
+      <div class="asm-local local-refugio">
+        <h3>{{lookup locais "refugio"}}</h3>
+        <ul class="asm-itens">
+          {{#each refugio}}<li class="asm-equip" data-item-id="{{id}}"><img src="{{img}}" alt=""><span class="asm-equip-nome" data-action="editarItem">{{name}}</span></li>{{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <div class="asm-capacidade">
+        <label>{{localize "ASSIMILACAO.Inventario.corpo"}} <input type="number" name="system.inventario.corpo" value="{{source.system.inventario.corpo}}" min="0"></label>
+        <label>{{localize "ASSIMILACAO.Inventario.mochila"}} <input type="number" name="system.inventario.mochila" value="{{source.system.inventario.mochila}}" min="0"></label>
+      </div>
+    </div>
+  </div>
+</section>

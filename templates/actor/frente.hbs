@@ -1,0 +1,103 @@
+<section class="tab asm-frente {{tab.cssClass}}" data-group="primary" data-tab="frente">
+  <div class="asm-acoes-rapidas">
+    <button type="button" data-action="rolarLivre"><i class="fa-solid fa-dice"></i> {{localize "ASSIMILACAO.Ficha.testeLivre"}}</button>
+    <button type="button" data-action="encerrarCena" data-tooltip="{{localize "ASSIMILACAO.Ficha.encerrarCenaDica"}}"><i class="fa-solid fa-clapperboard"></i> {{localize "ASSIMILACAO.Ficha.encerrarCena"}}</button>
+    <button type="button" data-action="repouso" data-tooltip="{{localize "ASSIMILACAO.Ficha.repousoDica"}}"><i class="fa-solid fa-campground"></i> {{localize "ASSIMILACAO.Ficha.repouso"}}</button>
+    <button type="button" data-action="novaSessao" data-tooltip="{{localize "ASSIMILACAO.Ficha.novaSessaoDica"}}"><i class="fa-solid fa-sun"></i> {{localize "ASSIMILACAO.Ficha.novaSessao"}}</button>
+  </div>
+
+  <div class="asm-colunas">
+    {{!-- APTIDÕES --}}
+    <div class="asm-aptidoes">
+      <h2 class="asm-titulo-secao">{{localize "ASSIMILACAO.Ficha.aptidoes"}}</h2>
+
+      <h3 class="asm-titulo-grupo instintos">{{localize "ASSIMILACAO.Grupo.instintos"}} <span class="asm-glifo quadrado"></span></h3>
+      <div class="asm-grade instintos">
+        {{#each instintos}}{{> aptidao this}}{{/each}}
+      </div>
+
+      <h3 class="asm-titulo-grupo conhecimentos">{{localize "ASSIMILACAO.Grupo.conhecimentos"}} <span class="asm-glifo losango"></span></h3>
+      <div class="asm-grade conhecimentos">
+        {{#each conhecimentos}}{{> aptidao this}}{{/each}}
+      </div>
+
+      <h3 class="asm-titulo-grupo praticas">{{localize "ASSIMILACAO.Grupo.praticas"}} <span class="asm-glifo losango"></span></h3>
+      <div class="asm-grade praticas">
+        {{#each praticas}}{{> aptidao this}}{{/each}}
+      </div>
+    </div>
+
+    {{!-- SAÚDE --}}
+    <div class="asm-saude">
+      <h2 class="asm-titulo-secao com-gota">
+        <img class="asm-gota-titulo" src="systems/assimilacao/assets/simbolos/gota.svg" alt="">
+        {{localize "ASSIMILACAO.Saude.titulo"}}
+        <small>{{localize "ASSIMILACAO.Saude.formula"}} = {{sys.saude.porNivel}}</small>
+      </h2>
+
+      <div class="asm-saude-bloco alta">
+        <p class="asm-saude-regra">{{localize "ASSIMILACAO.Saude.regraAlta"}}</p>
+        <div class="asm-saude-par">{{#each saude.alta}}{{> faixaSaude this}}{{/each}}</div>
+      </div>
+      <div class="asm-saude-bloco media">
+        <p class="asm-saude-regra">{{localize "ASSIMILACAO.Saude.regraMedia"}}</p>
+        <div class="asm-saude-par">{{#each saude.media}}{{> faixaSaude this}}{{/each}}</div>
+        <p class="asm-saude-nota">{{localize "ASSIMILACAO.Saude.notaMedia"}}</p>
+      </div>
+      <div class="asm-saude-bloco critica">
+        <p class="asm-saude-regra">{{localize "ASSIMILACAO.Saude.regraCritica"}}</p>
+        <div class="asm-saude-par">{{#each saude.critica}}{{> faixaSaude this}}{{/each}}</div>
+        <div class="asm-saude-notas-par">
+          <p class="asm-saude-nota">{{localize "ASSIMILACAO.Saude.nota2"}}</p>
+          <p class="asm-saude-nota">{{localize "ASSIMILACAO.Saude.nota1"}}</p>
+        </div>
+      </div>
+
+      <div class="asm-saude-resumo">
+        <span>{{localize "ASSIMILACAO.Saude.estado"}}: <strong>{{sys.saude.nome}}</strong></span>
+        <span>{{sys.saude.value}}/{{sys.saude.max}}</span>
+        <label class="asm-temp" data-tooltip="{{localize "ASSIMILACAO.Saude.temporariosDica"}}">
+          {{localize "ASSIMILACAO.Saude.temporarios"}}
+          <input type="number" name="system.saude.temporarios" value="{{source.system.saude.temporarios}}" min="0" step="1">
+        </label>
+        <button type="button" data-action="dano" class="mini"><i class="fa-solid fa-droplet-slash"></i> {{localize "ASSIMILACAO.Saude.dano"}}</button>
+        <button type="button" data-action="curar" class="mini"><i class="fa-solid fa-kit-medical"></i> {{localize "ASSIMILACAO.Saude.curar"}}</button>
+      </div>
+    </div>
+  </div>
+
+  {{!-- CABO DE GUERRA --}}
+  <div class="asm-cabo">
+    <div class="asm-vinha superior" aria-hidden="true"><span class="det"></span><span class="ass"></span></div>
+    <div class="asm-cabo-rotulos">
+      <span class="det">{{localize "ASSIMILACAO.Cabo.determinacao"}}</span>
+      <span class="ass">{{localize "ASSIMILACAO.Cabo.assimilacao"}}</span>
+    </div>
+    <div class="asm-cabo-linha">
+      <div class="asm-cabo-circulo det" data-tooltip="{{localize "ASSIMILACAO.Cabo.nivelD"}}">
+        <span class="nivel">{{sys.determinacao.nivel}}</span>
+        <span class="pontos">{{sys.determinacao.value}} d</span>
+        {{#if editable}}
+        <span class="ajuste">
+          <a data-action="ajustarD" data-delta="1" data-tooltip="{{localize "ASSIMILACAO.Cabo.subirD"}}"><i class="fa-solid fa-plus"></i></a>
+          <a data-action="ajustarD" data-delta="-1" data-tooltip="{{localize "ASSIMILACAO.Cabo.descerD"}}"><i class="fa-solid fa-minus"></i></a>
+        </span>
+        {{/if}}
+      </div>
+      <ol class="asm-lacos">
+        {{#each lacos}}
+        <li class="asm-laco {{lado}} {{#if cheio}}cheio{{/if}}" data-action="laco" data-n="{{n}}" data-lado="{{lado}}"
+            data-tooltip="{{#if (eq lado "det")}}{{localize "ASSIMILACAO.Cabo.lacoD"}}{{else}}{{localize "ASSIMILACAO.Cabo.lacoE"}}{{/if}}"
+            role="button" aria-pressed="{{cheio}}">
+          <svg viewBox="0 0 40 24" aria-hidden="true"><path class="m-esq" d="M3 3 L19 12 L3 21 Z"/><path class="m-dir" d="M37 3 L21 12 L37 21 Z"/></svg>
+        </li>
+        {{/each}}
+      </ol>
+      <div class="asm-cabo-circulo ass" data-tooltip="{{localize "ASSIMILACAO.Cabo.nivelE"}}">
+        <span class="nivel">{{E}}</span>
+        <span class="pontos">{{sys.assimilacao.value}} e</span>
+      </div>
+    </div>
+    <div class="asm-vinha inferior" aria-hidden="true"><span class="det"></span><span class="ass"></span></div>
+  </div>
+</section>

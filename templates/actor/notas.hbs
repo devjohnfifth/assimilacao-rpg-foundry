@@ -1,0 +1,26 @@
+<section class="tab asm-notas {{tab.cssClass}}" data-group="primary" data-tab="notas">
+  <div class="asm-colunas notas">
+    <div class="asm-bloco-rasgado">
+      <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Ficha.biografia"}}</h2>
+      <prose-mirror name="system.biografia" value="{{source.system.biografia}}" toggled
+                    data-document-uuid="{{actor.uuid}}">{{{biografiaHTML}}}</prose-mirror>
+    </div>
+    <div class="asm-bloco-rasgado">
+      <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Ficha.anotacoes"}}</h2>
+      <prose-mirror name="system.notas" value="{{source.system.notas}}" toggled
+                    data-document-uuid="{{actor.uuid}}">{{{notasHTML}}}</prose-mirror>
+    </div>
+  </div>
+  <div class="asm-progresso">
+    <h2 class="asm-titulo-secao">{{localize "ASSIMILACAO.Ficha.progressao"}}</h2>
+    <div class="asm-linha-dupla">
+      <label class="asm-campo curto"><span>{{localize "ASSIMILACAO.Ficha.xpTotal"}}</span>
+        <input type="number" name="system.experiencia.total" value="{{source.system.experiencia.total}}" min="0"></label>
+      <label class="asm-campo curto"><span>{{localize "ASSIMILACAO.Ficha.xpGasta"}}</span>
+        <input type="number" name="system.experiencia.gasta" value="{{source.system.experiencia.gasta}}" min="0"></label>
+      <span class="asm-xp-disp">{{localize "ASSIMILACAO.Ficha.xpDisponivel"}}: <strong>{{sys.experiencia.disponivel}}</strong></span>
+    </div>
+    <label class="asm-campo"><span>{{localize "ASSIMILACAO.Ficha.cicatrizes"}}</span>
+      <input type="text" name="system.cicatrizes" value="{{source.system.cicatrizes}}" placeholder="{{localize "ASSIMILACAO.Ficha.cicatrizesDica"}}"></label>
+  </div>
+</section>
