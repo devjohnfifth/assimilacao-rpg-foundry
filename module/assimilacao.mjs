@@ -8,13 +8,18 @@ import { RolagemAssimilacao } from "./dice/roll.mjs";
 import { registrarChat } from "./dice/chat.mjs";
 import { registrarDiceSoNice } from "./dice/dsn.mjs";
 import { InfectadoData } from "./data/infectado.mjs";
-import { CaracteristicaData, EquipamentoData, MutacaoData } from "./data/itens.mjs";
+import { PersonagemData } from "./data/personagem.mjs";
+import { AmeacaData } from "./data/ameaca.mjs";
+import { CaracteristicaData, EquipamentoData, MutacaoData, AtivacaoData } from "./data/itens.mjs";
 import { AtorAssimilacao } from "./documents/actor.mjs";
 import { ItemAssimilacao } from "./documents/item.mjs";
 import { FichaInfectado } from "./sheets/infectado-sheet.mjs";
 import { FichaItem } from "./sheets/item-sheet.mjs";
+import { FichaAmeaca } from "./sheets/ameaca-sheet.mjs";
 import { MontarTeste, executarTeste } from "./apps/montar-teste.mjs";
+import { EscolherAtor } from "./apps/escolher-ator.mjs";
 import { registrarEnricher } from "./helpers/enricher.mjs";
+import * as api from "./helpers/api.mjs";
 
 const SIS = "systems/assimilacao";
 
@@ -30,23 +35,33 @@ Hooks.once("init", () => {
   // Documentos e modelos de dados
   CONFIG.Actor.documentClass = AtorAssimilacao;
   CONFIG.Item.documentClass = ItemAssimilacao;
-  CONFIG.Actor.dataModels.infectado = InfectadoData;
+  Object.assign(CONFIG.Actor.dataModels, {
+    infectado: InfectadoData,
+    personagem: PersonagemData,
+    ameaca: AmeacaData
+  });
   Object.assign(CONFIG.Item.dataModels, {
     caracteristica: CaracteristicaData,
     equipamento: EquipamentoData,
-    mutacao: MutacaoData
+    mutacao: MutacaoData,
+    ativacao: AtivacaoData
   });
   CONFIG.Actor.trackableAttributes = {
-    infectado: { bar: ["saude", "determinacao", "assimilacao"], value: [] }
+    infectado: { bar: ["saude", "determinacao", "assimilacao"], value: [] },
+    personagem: { bar: ["saude", "determinacao", "assimilacao"], value: [] },
+    ameaca: { bar: ["neutralizacao"], value: [] }
   };
 
   // Fichas
   const { DocumentSheetConfig } = foundry.applications.apps;
   DocumentSheetConfig.registerSheet(Actor, "assimilacao", FichaInfectado, {
-    types: ["infectado"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloFicha"
+    types: ["infectado", "personagem"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloFicha"
+  });
+  DocumentSheetConfig.registerSheet(Actor, "assimilacao", FichaAmeaca, {
+    types: ["ameaca"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloAmeaca"
   });
   DocumentSheetConfig.registerSheet(Item, "assimilacao", FichaItem, {
-    types: ["caracteristica", "equipamento", "mutacao"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloItem"
+    types: ["caracteristica", "equipamento", "mutacao", "ativacao"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloItem"
   });
 
   // Configurações
@@ -91,21 +106,15 @@ Hooks.once("init", () => {
   registrarChat();
   registrarDiceSoNice();
 
-  // API pública para macros
+  // API pública para macros (ver o compêndio "Macros do Assimilação")
   game.assimilacao = {
-    RolagemAssimilacao, MontarTeste, executarTeste,
+    RolagemAssimilacao, MontarTeste, EscolherAtor, executarTeste,
     dados: { DadoInstinto, DadoLosango, DadoAssimilado },
+    ...api,
     /** Roda a suíte de testes automáticos (GM). Ex.: game.assimilacao.testar() */
     async testar(opcoes = {}) {
       const { executar } = await import("./dev/testes.mjs");
       return executar(opcoes);
-    },
-    /** Rola uma fórmula de símbolos mantendo todos os dados. Ex.: rolar("3dl", {tipo: "dano"}) */
-    async rolar(formula, opcoes = {}) {
-      const roll = new RolagemAssimilacao(formula, {}, { tipo: "livre", autor: game.user.id, ...opcoes });
-      await roll.evaluate();
-      await roll.toMessage({ speaker: ChatMessage.getSpeaker() });
-      return roll;
     }
   };
 });

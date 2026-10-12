@@ -1,0 +1,21 @@
+{
+  "_id": "asmMacroDados002",
+  "_key": "!macros!asmMacroDados002",
+  "name": "Rolar Dados (livre ou dano)",
+  "type": "script",
+  "author": null,
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "// Rola ■ ◆ ⬟ avulsos, mantendo todos. No modo Dano, cada símbolo é 1 ponto de dano.\ngame.assimilacao.rolarDadosDialogo();",
+  "folder": null,
+  "sort": 200000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.367",
+    "systemId": "assimilacao",
+    "systemVersion": "0.2.0"
+  }
+}

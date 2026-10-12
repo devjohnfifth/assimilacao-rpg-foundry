@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 0.2.0
+- Personagens do(a) Assimilador(a) (NPCs): relação com o grupo, grupo, segredos só do GM e ficha simplificada.
+- Ameaças: ficha no visual da partitura, pool próprio, Ativações com casas de custo, disparo com dano rolado ou fixo,
+  uso único, Neutralização que cresce com os Infectados presentes e assistente de balanceamento (p. 206–211).
+- Novo item: Ativação.
+- Compêndio "Macros do Assimilação" com seis macros; a macro Rolar Teste abre a lista quando você tem mais de um personagem.
+- Fim de cena, repouso e nova sessão renovam os usos das Características e Mutações conforme a renovação de cada uma.
+- API: `abrirTeste`, `escolherAtor`, `rolarDadosDialogo`, `encerrarCenaGrupo`, `repousoGrupo`, `novaSessaoGrupo`, `rolarPoolAmeaca`.
+
 ## 0.1.1
 - Contraste: campos, listas e caixas de marcar legíveis no tema escuro do Foundry (tinta sobre papel).
 - Ícones da barra de título das fichas voltaram a aparecer.

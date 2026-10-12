@@ -5,7 +5,8 @@ export class ItemAssimilacao extends Item {
   static ICONES = {
     caracteristica: "icons/svg/aura.svg",
     equipamento: "icons/svg/item-bag.svg",
-    mutacao: "icons/svg/biohazard.svg"
+    mutacao: "icons/svg/biohazard.svg",
+    ativacao: "icons/svg/lightning.svg"
   };
 
   /** @override */

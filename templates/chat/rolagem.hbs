@@ -82,7 +82,9 @@
   </div>
   {{/if}}
 
-  {{#if res.C}}
+  {{#if ehPool}}
+  <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Rolagem.investirPool"}}</p>
+  {{else if res.C}}
   <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Rolagem.cParaGM" n=res.C}}{{#if consequencia}} <span class="asm-consequencia">({{localize "ASSIMILACAO.Rolagem.escala"}}: {{consequencia}})</span>{{/if}}</p>
   {{/if}}
   {{#if ajustes.cDeterminacao}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.cAbateuD" n=ajustes.cDeterminacao}}</p>{{/if}}

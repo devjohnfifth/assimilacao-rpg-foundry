@@ -1,10 +1,13 @@
 {
   "name": "assimilacao-rpg",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG.",
   "type": "module",
   "scripts": {
-    "check": "node scripts/check.mjs"
+    "build:packs": "node scripts/build-packs.mjs"
+  },
+  "devDependencies": {
+    "@foundryvtt/foundryvtt-cli": "^3.0.0"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "_id": "asmMacroSessao05",
+  "_key": "!macros!asmMacroSessao05",
+  "name": "Nova Sessão (grupo)",
+  "type": "script",
+  "author": null,
+  "img": "icons/svg/sun.svg",
+  "scope": "global",
+  "command": "// Nova sessão para todos os Infectados do grupo: libera as Origens e renova os usos por sessão.\ngame.assimilacao.novaSessaoGrupo();",
+  "folder": null,
+  "sort": 500000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.367",
+    "systemId": "assimilacao",
+    "systemVersion": "0.2.0"
+  }
+}

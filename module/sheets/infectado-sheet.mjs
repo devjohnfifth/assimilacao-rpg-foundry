@@ -5,6 +5,8 @@ const T = "systems/assimilacao/templates/actor";
 
 /**
  * Ficha de Infectado — reproduz a ficha oficial (p. 313–314) com interatividade.
+ * Também serve aos Personagens do(a) Assimilador(a) (NPCs): relação com o grupo, segredos só do GM
+ * e modo simplificado (só Aptidões, Saúde e Cabo de Guerra).
  */
 export class FichaInfectado extends HandlebarsApplicationMixin(ActorSheetV2) {
 
@@ -140,14 +142,32 @@ export class FichaInfectado extends HandlebarsApplicationMixin(ActorSheetV2) {
       biografiaHTML: await enriquecer(sys.biografia),
       notasHTML: await enriquecer(sys.notas),
       estados: this.#estados(sys),
-      isGM: game.user.isGM
+      isGM: game.user.isGM,
+      ehPersonagem: actor.type === "personagem",
+      simplificado: this.simplificado,
+      relacoes: Object.fromEntries(Object.entries(S.RELACOES).map(([k, v]) => [k, loc(v)])),
+      segredosHTML: (actor.type === "personagem") && game.user.isGM ? await enriquecer(sys.segredos.notas) : ""
     });
+  }
+
+  /** Personagem em modo simplificado: some a aba Verso. */
+  get simplificado() {
+    return (this.actor.type === "personagem") && !!this.actor.system.simplificado;
+  }
+
+  /** @override */
+  _getTabsConfig(group) {
+    const config = super._getTabsConfig(group);
+    if ( (group !== "primary") || !this.simplificado ) return config;
+    if ( this.tabGroups.primary === "verso" ) this.tabGroups.primary = "frente";
+    return { ...config, tabs: config.tabs.filter(t => t.id !== "verso") };
   }
 
   /** @override */
   async _preparePartContext(partId, context, options) {
     context = await super._preparePartContext(partId, context, options);
-    if ( context.tabs?.[partId] ) context.tab = context.tabs[partId];
+    // O contexto é compartilhado entre as partes: limpa a aba anterior (uma aba oculta não herda "active").
+    context.tab = context.tabs?.[partId];
     return context;
   }
 
@@ -251,10 +271,7 @@ export class FichaInfectado extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   static #novaSessao() {
-    return this.actor.update({
-      "system.origens.eventoMarcante.usado": false,
-      "system.origens.ocupacao.usado": false
-    });
+    return this.actor.novaSessao();
   }
 
   static async #criarItem(event, target) {

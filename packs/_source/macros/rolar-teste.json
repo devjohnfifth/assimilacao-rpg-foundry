@@ -1,0 +1,21 @@
+{
+  "_id": "asmMacroTeste001",
+  "_key": "!macros!asmMacroTeste001",
+  "name": "Rolar Teste",
+  "type": "script",
+  "author": null,
+  "img": "systems/assimilacao/assets/simbolos/sucesso.svg",
+  "scope": "global",
+  "command": "// Abre a tela \"Montar Teste\" do seu personagem.\n// Com um token selecionado, usa esse personagem; se você tiver mais de um, mostra a lista para escolher.\ngame.assimilacao.abrirTeste();",
+  "folder": null,
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.367",
+    "systemId": "assimilacao",
+    "systemVersion": "0.2.0"
+  }
+}

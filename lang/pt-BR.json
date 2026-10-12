@@ -1,12 +1,15 @@
 {
   "TYPES": {
     "Actor": {
-      "infectado": "Infectado(a)"
+      "infectado": "Infectado(a)",
+      "personagem": "Personagem (PdA)",
+      "ameaca": "Ameaça"
     },
     "Item": {
       "caracteristica": "Característica",
       "equipamento": "Equipamento",
-      "mutacao": "Mutação"
+      "mutacao": "Mutação",
+      "ativacao": "Ativação"
     }
   },
   "ASSIMILACAO": {
@@ -95,7 +98,8 @@
     "Abas": {
       "frente": "Ficha",
       "verso": "Verso",
-      "notas": "Notas"
+      "notas": "Notas",
+      "partitura": "Partitura"
     },
     "Origens": {
       "titulo": "Origens",
@@ -149,7 +153,9 @@
       "xpGasta": "Gasta",
       "xpDisponivel": "Disponível",
       "cicatrizes": "Cicatrizes emocionais",
-      "cicatrizesDica": "abalo, paranoia, cólera…"
+      "cicatrizesDica": "abalo, paranoia, cólera…",
+      "rotuloAmeaca": "Ameaça (partitura)",
+      "editar": "Editar"
     },
     "Saude": {
       "titulo": "Saúde",
@@ -222,7 +228,8 @@
         "assimilada": "Rolagem Assimilada",
         "dano": "Dano",
         "assimilacao": "Teste de Assimilação",
-        "livre": "Rolagem"
+        "livre": "Rolagem",
+        "pool": "Pool da Ameaça"
       },
       "escolha": "Escolha os dados mantidos: {min}–{max} (selecionados: {sel}).",
       "sugerir": "Sugerir",
@@ -240,7 +247,8 @@
       "escala": "escala",
       "cAbateuD": "{n} Pressão abateu Determinação.",
       "gmAbaterD": "Pressão: −1 d",
-      "gmReverter": "Reverter ajustes"
+      "gmReverter": "Reverter ajustes",
+      "investirPool": "O(A) Assimilador(a) investe todos os A e C nas Ativações (B são opcionais)."
     },
     "Avisos": {
       "semAtor": "Personagem da rolagem não encontrado.",
@@ -362,6 +370,214 @@
           "label": "Descrição"
         }
       }
+    },
+    "Nivel": {
+      "iniciante": "Iniciantes (fichas iniciais)",
+      "intermediario": "Intermediários (21–40 de Experiência)",
+      "avancado": "Avançados (41–60)",
+      "epico": "Épicos (60+)"
+    },
+    "Relacao": {
+      "aliado": "Aliado(a)",
+      "neutro": "Neutro(a)",
+      "hostil": "Hostil",
+      "desconhecido": "Desconhecido(a)"
+    },
+    "Personagem": {
+      "grupoDica": "Refúgio, bando ou facção",
+      "conceitoDica": "Quem é, em poucas palavras",
+      "segredos": "Segredos do(a) Assimilador(a)",
+      "segredosDica": "Só o(a) GM vê esta parte da ficha.",
+      "motivacaoDica": "O que quer de verdade?",
+      "propositoAntagonistaDica": "Com que Propósito dos Infectados isso colide?",
+      "FIELDS": {
+        "relacao": {
+          "label": "Relação com o grupo"
+        },
+        "grupo": {
+          "label": "Grupo"
+        },
+        "simplificado": {
+          "label": "Ficha simplificada",
+          "hint": "Para figurantes: mostra só Aptidões, Saúde e Cabo de Guerra."
+        },
+        "segredos": {
+          "motivacao": {
+            "label": "Motivação real"
+          },
+          "propositoAntagonista": {
+            "label": "Propósito antagonista"
+          },
+          "notas": {
+            "label": "Notas secretas"
+          }
+        }
+      }
+    },
+    "Ameaca": {
+      "conflito": "Conflito",
+      "pool": "Pool",
+      "valor": "Valor do pool",
+      "valorDica": "Valor dos dados: ■ = 1, ◆ = 2, ⬟ = 3 (p. 206).",
+      "recomendado": "recomendado",
+      "balanco": {
+        "ok": "no ponto",
+        "perto": "quase no ponto",
+        "forte": "acima do recomendado",
+        "fraco": "abaixo do recomendado"
+      },
+      "interessesDica": "Interesses: o que esta Ameaça quer?",
+      "neutralizada": "Neutralizada",
+      "ativacoes": "Ativações de Ameaça",
+      "ativacoesConflito": "Ativações do Conflito",
+      "semAtivacoes": "Nenhuma Ativação ainda.",
+      "novaAtivacao": "Nova Ativação",
+      "neutralizacao": "Neutralização",
+      "especialDica": "Regra especial, ex.: só vale com 1 B no mesmo turno",
+      "recompensasDica": "Experiência, recursos, informações…",
+      "rolarPool": "Rolar pool",
+      "avisoSoC": "Falta uma Ativação paga só com C.",
+      "avisoSoA": "Falta uma Ativação paga só com A.",
+      "avisoSemDados": "O pool está vazio.",
+      "FIELDS": {
+        "interesses": {
+          "label": "Interesses"
+        },
+        "nivel": {
+          "label": "Nível do grupo"
+        },
+        "pool": {
+          "q": {
+            "label": "Dados ■"
+          },
+          "l": {
+            "label": "Dados ◆"
+          },
+          "p": {
+            "label": "Dados ⬟"
+          }
+        },
+        "infectadosPresentes": {
+          "label": "Infectados presentes"
+        },
+        "ehOProprioConflito": {
+          "label": "É o próprio Conflito",
+          "hint": "Quando a Ameaça é o único gerador do Conflito: usa a tabela de valor do Conflito."
+        },
+        "neutralizacao": {
+          "base": {
+            "label": "Custo (A)"
+          },
+          "porInfectado": {
+            "label": "+A por Infectado além do primeiro"
+          },
+          "value": {
+            "label": "A investidos"
+          },
+          "max": {
+            "label": "Custo total"
+          },
+          "especial": {
+            "label": "Especial"
+          },
+          "consequencia": {
+            "label": "Ao ser neutralizada"
+          }
+        },
+        "recompensas": {
+          "label": "Recompensas"
+        },
+        "descricao": {
+          "label": "Descrição"
+        },
+        "notas": {
+          "label": "Notas"
+        }
+      }
+    },
+    "Ativacao": {
+      "efeito": "Efeito",
+      "semCusto": "sem custo definido",
+      "disparou": "Ativação disparada",
+      "dispararDica": "Disparar (Shift: dispara mesmo sem completar o custo)",
+      "disparosDica": "Vezes que já disparou",
+      "limpar": "Zerar o progresso",
+      "esgotada": "Esta Ativação é de uso único e já foi usada.",
+      "incompleta": "O custo desta Ativação ainda não foi pago. Segure Shift para disparar assim mesmo.",
+      "danoInvalido": "Não consegui rolar o dano \"{formula}\". Use, por exemplo, 3◆, 2dl + 1dq ou um número.",
+      "danoFixo": "{n} de dano",
+      "FIELDS": {
+        "custo": {
+          "label": "Custo",
+          "hint": "Quantos A, B e C o(a) Assimilador(a) precisa investir para disparar.",
+          "A": {
+            "label": "A"
+          },
+          "B": {
+            "label": "B"
+          },
+          "C": {
+            "label": "C"
+          }
+        },
+        "progresso": {
+          "label": "Já investido",
+          "A": {
+            "label": "A"
+          },
+          "B": {
+            "label": "B"
+          },
+          "C": {
+            "label": "C"
+          }
+        },
+        "dano": {
+          "label": "Dano",
+          "hint": "Dados rolados ao disparar (cada símbolo = 1 de dano), ex.: 3◆ ou 2dl + 1dq. Um número sozinho é dano fixo."
+        },
+        "alvos": {
+          "label": "Alvos",
+          "hint": "Ex.: um alvo, todos na área, os Infectados."
+        },
+        "unicaVez": {
+          "label": "Uso único",
+          "hint": "Dispara uma única vez. Para liberar de novo, zere os Disparos."
+        },
+        "pagamentoIntegral": {
+          "label": "Pagamento integral",
+          "hint": "O custo inteiro precisa ser pago num único turno."
+        },
+        "requerMunicao": {
+          "label": "Requer munição",
+          "hint": "Lembrete de controle de munição."
+        },
+        "disparos": {
+          "label": "Disparos"
+        },
+        "descricao": {
+          "label": "Efeito"
+        }
+      }
+    },
+    "Escolher": {
+      "titulo": "Escolher personagem",
+      "tituloTeste": "Rolar teste: quem age?",
+      "tituloAmeaca": "Rolar pool: qual Ameaça?",
+      "dica": "Você controla mais de um personagem. Escolha quem age.",
+      "buscar": "Buscar pelo nome…",
+      "meu": "seu personagem",
+      "nenhum": "Você não é dono(a) de nenhum personagem que possa fazer isso. Peça ao(à) GM para atribuir um."
+    },
+    "Macro": {
+      "semInfectados": "Nenhum Infectado encontrado para esta ação.",
+      "encerrarCenaGrupo": "Fim de cena do grupo",
+      "novaSessaoGrupo": "Nova sessão do grupo",
+      "repousoGrupo": "Repouso completo do grupo",
+      "rolarDados": "Rolar dados",
+      "tipoRolagem": "Tipo",
+      "tituloRolagem": "Título",
+      "tituloRolagemDica": "opcional, ex.: Mordida da lontrariranha"
     }
   }
 }

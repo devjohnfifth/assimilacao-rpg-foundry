@@ -9,6 +9,9 @@ import { RolagemAssimilacao } from "../dice/roll.mjs";
 import { MontarTeste, executarTeste } from "../apps/montar-teste.mjs";
 import { FichaInfectado } from "../sheets/infectado-sheet.mjs";
 import { FichaItem } from "../sheets/item-sheet.mjs";
+import { FichaAmeaca } from "../sheets/ameaca-sheet.mjs";
+import { EscolherAtor } from "../apps/escolher-ator.mjs";
+import { formulaDeDano } from "../documents/actor.mjs";
 
 const PREFIXO = "[TESTE]";
 
@@ -113,6 +116,9 @@ export async function executar({ limpar = true } = {}) {
       await testarMontarTeste(s, ator, criados);
       await testarCard(s, ator, criados);
       await testarExtras(s, ator, criados);
+      const pda = await testarPdA(s, criados);
+      const ameaca = await testarAmeaca(s, criados);
+      await testarApi(s, ator, pda, ameaca, criados);
     }
     await testarTextos(s);
   } catch(err) {
@@ -131,8 +137,9 @@ export async function executar({ limpar = true } = {}) {
 
   // Limpeza: só o que os testes criaram
   if ( limpar ) {
-    for ( const app of foundry.applications.instances.values() ) {
-      if ( (app instanceof FichaInfectado) || (app instanceof FichaItem) || (app instanceof MontarTeste) ) {
+    for ( const app of [...foundry.applications.instances.values()] ) {
+      if ( app instanceof EscolherAtor ) { await app.close(); continue; }
+      if ( (app instanceof FichaInfectado) || (app instanceof FichaAmeaca) || (app instanceof FichaItem) || (app instanceof MontarTeste) ) {
         if ( criados.atores.some(a => app.document?.parent === a || app.document === a || app.actor === a) ) await app.close();
       }
     }
@@ -158,8 +165,11 @@ async function testarRegistro(s) {
   s.ok(CONFIG.Dice.terms.q === DadoInstinto && CONFIG.Dice.terms.l === DadoLosango && CONFIG.Dice.terms.p === DadoAssimilado,
     "Termos dq, dl e dp registrados");
   s.ok(CONFIG.Dice.rolls.includes(RolagemAssimilacao), "RolagemAssimilacao registrada em CONFIG.Dice.rolls");
-  s.ok(!!CONFIG.Actor.dataModels.infectado, "Modelo de dados infectado");
-  s.ok(["caracteristica", "equipamento", "mutacao"].every(t => CONFIG.Item.dataModels[t]), "Modelos de Item");
+  s.ok(["infectado", "personagem", "ameaca"].every(t => CONFIG.Actor.dataModels[t]), "Modelos de Ator: infectado, personagem, ameaca");
+  s.ok(["caracteristica", "equipamento", "mutacao", "ativacao"].every(t => CONFIG.Item.dataModels[t]), "Modelos de Item (com Ativação)");
+  s.igual(CONFIG.Actor.trackableAttributes?.ameaca?.bar, ["neutralizacao"], "Barra rastreável da Ameaça: Neutralização");
+  s.ok(["personagem", "ameaca"].every(t => game.i18n.has(`TYPES.Actor.${t}`)) && game.i18n.has("TYPES.Item.ativacao"),
+    "Nomes dos novos tipos traduzidos");
   s.igual(CONFIG.Actor.trackableAttributes?.infectado?.bar, ["saude", "determinacao", "assimilacao"], "Barras de token rastreáveis");
   s.ok(["Barlow Semi Condensed", "EB Garamond", "Grape Nuts", "Special Elite", "Rock Salt"].every(f => CONFIG.fontDefinitions[f]),
     "Fontes livres registradas");
@@ -957,6 +967,343 @@ async function testarExtras(s, ator, criados) {
     div.innerHTML = html;
     s.igual(div.querySelector(".inline-roll")?.textContent.trim(), "2", "Rolagem inline [[1dl]] mostra os Sucessos (AA = 2)");
   });
+}
+
+/* -------------------------------------------- */
+/*  11. Personagens do(a) Assimilador(a)        */
+/* -------------------------------------------- */
+
+async function testarPdA(s, criados) {
+  s.grupo("PdA");
+  let pda;
+  await s.tentar("Criar PdA", async () => {
+    pda = await Actor.create({ name: `${PREFIXO} Velho Tonho`, type: "personagem" });
+    criados.atores.push(pda);
+  });
+  if ( !pda ) return null;
+  s.ok(pda.sheet instanceof FichaInfectado, "PdA usa a ficha de Infectado(a)");
+  s.igual([pda.prototypeToken.actorLink, pda.prototypeToken.disposition, pda.prototypeToken.bar1.attribute],
+    [false, CONST.TOKEN_DISPOSITIONS.NEUTRAL, "saude"], "Token do PdA: neutro, não vinculado, barra de Saúde");
+  s.igual([pda.system.saude.max, pda.system.determinacao.nivel, pda.system.relacao], [18, 9, "neutro"], "PdA recebe os mesmos padrões do Infectado");
+
+  const ficha = pda.sheet;
+  await ficha.render({ force: true });
+  s.ok(await ate(() => ficha.rendered), "Ficha do PdA aberta");
+  const q = sel => ficha.element?.querySelector(sel);
+  s.ok(!!q('select[name="system.relacao"]') && !!q('input[name="system.grupo"]'), "Campos de relação e grupo no cabeçalho");
+  s.ok(!!q(".asm-segredos") && !!q('input[name="system.segredos.motivacao"]'), "GM vê os segredos do PdA");
+  s.igual(chavesCruas(ficha.element.innerHTML), [], "Ficha do PdA sem chaves de idioma faltando");
+
+  ficha.changeTab("verso", "primary");
+  await pda.update({ "system.simplificado": true, "system.relacao": "hostil" });
+  s.ok(await ate(() => !q('nav.tabs [data-tab="verso"]')), "Modo simplificado esconde a aba Verso");
+  s.ok(q('section.tab[data-tab="frente"]')?.classList.contains("active")
+    && !q('section.tab[data-tab="verso"]')?.classList.contains("active"), "Com a aba Verso aberta, volta para a Ficha");
+  s.ok(!q('input[name="system.origens.eventoMarcante.texto"]') && !!q('input[name="system.conceito"]'),
+    "Modo simplificado: sem Origens e Propósitos, com Conceito");
+  s.ok(q(".asm-cabecalho")?.classList.contains("relacao-hostil"), "Relação hostil marcada no cabeçalho");
+  const visiveis = [...ficha.element.querySelectorAll("section.tab")].filter(sec => sec.offsetParent !== null);
+  s.igual(visiveis.length, 1, "Só uma aba visível de cada vez");
+  await pda.update({ "system.simplificado": false });
+  s.ok(await ate(() => !!q('nav.tabs [data-tab="verso"]')), "Desligar o modo simplificado devolve a aba Verso");
+
+  const p = pda.rolarTeste({ aptidao: "armas" });
+  s.ok(await ate(() => acharApp(pda)), "PdA abre o Montar Teste");
+  await acharApp(pda)?.close();
+  await p;
+  await ficha.close();
+  return pda;
+}
+
+/* -------------------------------------------- */
+/*  12. Ameaças                                 */
+/* -------------------------------------------- */
+
+async function testarAmeaca(s, criados) {
+  s.grupo("Ameaça");
+  let am;
+  await s.tentar("Criar Ameaça", async () => {
+    am = await Actor.create({ name: `${PREFIXO} Lontrariranha`, type: "ameaca" });
+    criados.atores.push(am);
+  });
+  if ( !am ) return null;
+  const sys = () => am.system;
+  s.ok(am.sheet instanceof FichaAmeaca, "Ficha padrão da Ameaça é a partitura");
+  s.igual([am.img, am.prototypeToken.actorLink, am.prototypeToken.disposition, am.prototypeToken.bar1.attribute],
+    ["icons/svg/hazard.svg", false, CONST.TOKEN_DISPOSITIONS.HOSTILE, "neutralizacao"],
+    "Ameaça: ícone de perigo, token hostil, não vinculado, barra de Neutralização");
+  s.igual([sys().valorPool, sys().recomendado, sys().balanco], [2, 3, "perto"], "Pool padrão 2■: valor 2, recomendado 3 (iniciantes, 1 Infectado)");
+
+  // Assistente de balanceamento (p. 206–211)
+  await am.update({ "system.pool": { q: 2, l: 1, p: 1 }, "system.infectadosPresentes": 3 });
+  s.igual([sys().valorPool, sys().totalDados, sys().recomendado, sys().balanco], [7, 4, 5, "forte"],
+    "2■ + 1◆ + 1⬟ vale 7; iniciantes com 3 Infectados: 2 + 3 = 5 (acima)");
+  await am.update({ "system.nivel": "intermediario" });
+  s.igual([sys().recomendado, sys().balanco], [10, "fraco"], "Intermediários com 3 Infectados: 4 + 6 = 10 (abaixo)");
+  await am.update({ "system.nivel": "iniciante", "system.ehOProprioConflito": true });
+  s.igual([sys().recomendado, sys().balanco], [6, "perto"], "Como o próprio Conflito: tabela do Conflito, 3 + 3 = 6");
+  await am.update({ "system.ehOProprioConflito": false, "system.nivel": "epico", "system.infectadosPresentes": 1, "system.pool": { q: 0, l: 0, p: 4 } });
+  s.igual([sys().valorPool, sys().recomendado, sys().balanco], [12, 12, "ok"], "Épicos com 1 Infectado: 8 + 4 = 12 com 4⬟ (no ponto)");
+
+  // Neutralização escala com os presentes
+  await am.update({ "system.neutralizacao.base": 3, "system.neutralizacao.porInfectado": 2, "system.infectadosPresentes": 3,
+    "system.nivel": "iniciante", "system.pool": { q: 2, l: 1, p: 0 } });
+  s.igual(sys().neutralizacao.max, 7, "Neutralização 3A + 2A por Infectado além do primeiro (3 presentes) = 7A");
+  const token = await am.getTokenDocument({ x: 0, y: 0 });
+  const barra = token.getBarAttribute("bar1");
+  s.igual([barra?.attribute, barra?.value, barra?.max], ["neutralizacao", 0, 7], "Barra do token: Neutralização 0/7");
+
+  // Partitura
+  const ficha = am.sheet;
+  await ficha.render({ force: true });
+  s.ok(await ate(() => ficha.rendered), "Partitura aberta");
+  const q = sel => ficha.element?.querySelector(sel);
+  const qa = sel => [...(ficha.element?.querySelectorAll(sel) ?? [])];
+  s.ok(q(".asm-pt-pool")?.textContent.includes("2■") && q(".asm-pt-pool")?.textContent.includes("1◆"), "Pool à direita do título");
+  s.igual(qa('[data-action="casaNeutralizacao"]').length, 7, "Sete casas de Neutralização");
+  s.igual(qa(".asm-pt-avisos li").length, 2, "Avisos: falta Ativação só de C e só de A");
+  s.igual(chavesCruas(ficha.element.innerHTML), [], "Partitura sem chaves de idioma faltando");
+  const nome = q("input.asm-pt-nome");
+  const corTitulo = contraste(getComputedStyle(nome).color, getComputedStyle(q(".asm-pt-titulo")).backgroundColor);
+  s.ok(corTitulo >= 4.5, `Contraste do título da partitura ≥ 4.5 (${corTitulo.toFixed(1)})`);
+  const abaAtiva = q("nav.sheet-tabs > a.active");
+  const corAba = abaAtiva ? contraste(getComputedStyle(abaAtiva).color, getComputedStyle(abaAtiva).backgroundColor) : 0;
+  s.ok(corAba >= 4.5, `Contraste da aba ativa ≥ 4.5 (${corAba.toFixed(1)})`);
+
+  await clicarEsperar(ficha, '[data-action="casaNeutralizacao"][data-i="3"]');
+  s.ok(await ate(() => sys().neutralizacao.value === 3), "Clicar na 3ª casa: 3A investidos");
+  await clicarEsperar(ficha, '[data-action="casaNeutralizacao"][data-i="3"]');
+  s.ok(await ate(() => sys().neutralizacao.value === 2), "Clicar de novo desmarca a casa");
+  await am.update({ "system.neutralizacao.value": 7 });
+  s.ok(await ate(() => sys().neutralizada && !!q(".asm-carimbo")), "Neutralização completa: carimbo NEUTRALIZADA");
+  await am.update({ "system.neutralizacao.value": 0 });
+
+  // Ativações
+  const nItens = am.items.size;
+  await clicarEsperar(ficha, '[data-action="criarAtivacao"]');
+  s.ok(await ate(() => am.items.size === nItens + 1), "Botão cria uma Ativação");
+  const ativ = am.items.find(i => i.type === "ativacao");
+  s.igual([ativ?.system.custo.C, ativ?.img], [2, "icons/svg/lightning.svg"], "Nova Ativação: custo CC, ícone de raio");
+  if ( !ativ ) return am;
+  s.ok(await ate(() => ativ.sheet?.rendered), "Ficha da Ativação abre");
+  const fi = ativ.sheet.element;
+  s.ok(fi.querySelectorAll('input[name^="system.custo."]').length === 3 && !fi.querySelector(".asm-usos-campos"),
+    "Ficha da Ativação: custo em A/B/C e sem campos de usos");
+  s.igual(chavesCruas(fi.innerHTML), [], "Ficha da Ativação sem chaves de idioma faltando");
+  await ativ.sheet.close();
+
+  await ate(() => qa(`[data-item-id="${ativ.id}"] [data-action="casaAtivacao"]`).length === 2);
+  s.igual(qa(`[data-item-id="${ativ.id}"] [data-action="casaAtivacao"]`).length, 2, "Duas casas de C na Ativação");
+  await clicarEsperar(ficha, `[data-item-id="${ativ.id}"] [data-action="casaAtivacao"][data-i="1"]`);
+  s.ok(await ate(() => ativ.system.progresso.C === 1 && !ativ.system.completa), "1 de 2 C: progresso parcial fica registrado");
+  await clicarEsperar(ficha, `[data-item-id="${ativ.id}"] [data-action="casaAtivacao"][data-i="2"]`);
+  s.ok(await ate(() => ativ.system.completa && !!q(`[data-item-id="${ativ.id}"] .disparar.pronta`)), "Custo pago: Ativação pronta para disparar");
+
+  let n = game.messages.size;
+  await clicarEsperar(ficha, `[data-item-id="${ativ.id}"] [data-action="dispararAtivacao"]`);
+  s.ok(await ate(() => game.messages.size === n + 1), "Disparar anuncia no chat");
+  s.ok(game.messages.contents.at(-1)?.content.includes("ativacao-card"), "Card da Ativação no chat");
+  s.ok(await ate(() => ativ.system.progresso.C === 0 && ativ.system.disparos === 1), "Disparo zera o progresso e conta 1 disparo");
+
+  // Dano rolado e dano fixo
+  await ativ.update({ "system.dano": "2◆", "system.alvos": "um alvo" });
+  n = game.messages.size;
+  await comFaces([9, 9], () => am.dispararAtivacao(ativ, { forcar: true }));
+  s.ok(await ate(() => game.messages.size === n + 2), "Dano 2◆: anúncio + rolagem de dano");
+  const rDano = game.messages.contents.at(-1)?.rolls[0];
+  s.igual([rDano?.options.tipo, rDano?.total], ["dano", 6], "Dano 2◆ com ABC + ABC = 6 pontos");
+  await ativ.update({ "system.dano": "3" });
+  n = game.messages.size;
+  await am.dispararAtivacao(ativ, { forcar: true });
+  s.ok(await ate(() => game.messages.size === n + 1), "Dano fixo não rola dados");
+  s.ok(game.messages.contents.at(-1)?.content.includes("asm-dano-fixo"), "Card mostra o dano fixo");
+  await ativ.update({ "system.dano": "xyz" });
+  n = game.messages.size;
+  await am.dispararAtivacao(ativ, { forcar: true });
+  await espera(200);
+  s.igual(game.messages.size, n + 1, "Dano inválido avisa e não quebra (só o anúncio)");
+
+  // Sem pagar e uso único
+  n = game.messages.size;
+  await am.dispararAtivacao(ativ);
+  await espera(150);
+  s.igual(game.messages.size, n, "Sem o custo pago, não dispara (sem Shift)");
+  await ativ.update({ "system.unicaVez": true });
+  s.ok(ativ.system.esgotada, "Uso único já disparado: esgotada");
+  await am.dispararAtivacao(ativ, { forcar: true });
+  await espera(150);
+  s.igual(game.messages.size, n, "Uso único esgotado não dispara");
+  await ativ.update({ "system.unicaVez": false, "system.dano": "" });
+
+  // Avisos somem com Ativações só de C e só de A
+  await am.createEmbeddedDocuments("Item", [{ type: "ativacao", name: `${PREFIXO} Fuga para a água`, system: { custo: { A: 3 } } }]);
+  s.ok(await ate(() => !q(".asm-pt-avisos")), "Com Ativações só de C e só de A, sem avisos");
+  await clicarEsperar(ficha, `[data-item-id="${ativ.id}"] [data-action="limparAtivacao"]`);
+
+  // Pool da Ameaça
+  n = game.messages.size;
+  const rPool = await comFaces([6, 1, 9], () => am.rolarPool());
+  s.igual([rPool?.options.tipo, rPool?.mantemTodos], ["pool", true], "Pool rolado mantendo todos os dados");
+  s.ok(await ate(() => game.messages.size === n + 1), "Pool no chat");
+  const htmlPool = await game.messages.contents.at(-1).renderHTML();
+  s.ok(htmlPool.textContent.includes(game.i18n.localize("ASSIMILACAO.Rolagem.investirPool")), "Card do pool lembra de investir A e C");
+  s.igual(chavesCruas(htmlPool.innerHTML), [], "Card do pool sem chaves de idioma faltando");
+
+  // Ficha estreita
+  ficha.setPosition({ width: 520 });
+  await espera(250);
+  const sec = q('section.tab[data-tab="partitura"]');
+  s.ok(sec && (sec.scrollWidth <= sec.clientWidth + 2), "Partitura a 520 px sem rolagem horizontal", `${sec?.scrollWidth} > ${sec?.clientWidth}`);
+  ficha.changeTab("notas", "primary");
+  await espera(100);
+  s.ok(q('section.tab[data-tab="notas"]')?.classList.contains("active") && !!q('prose-mirror[name="system.descricao"]'), "Aba Notas da Ameaça");
+  await ficha.close();
+  return am;
+}
+
+/* -------------------------------------------- */
+/*  13. Macros e API                            */
+/* -------------------------------------------- */
+
+function acharEscolha() {
+  for ( const app of foundry.applications.instances.values() ) {
+    if ( (app instanceof EscolherAtor) && app.rendered ) return app;
+  }
+  return null;
+}
+
+function acharDialogo(seletor) {
+  for ( const app of foundry.applications.instances.values() ) {
+    if ( app.rendered && app.element?.querySelector(seletor) ) return app;
+  }
+  return null;
+}
+
+async function testarApi(s, ator, pda, am, criados) {
+  s.grupo("Macros e API");
+  const api = game.assimilacao;
+  const funcoes = ["abrirTeste", "escolherAtor", "atoresDoUsuario", "rolarDadosDialogo", "encerrarCenaGrupo",
+    "novaSessaoGrupo", "repousoGrupo", "rolarPoolAmeaca", "rolar", "infectadosDoGrupo"];
+  s.ok(funcoes.every(f => typeof api[f] === "function"), "Funções da API disponíveis", funcoes.filter(f => typeof api[f] !== "function").join(", "));
+
+  // Conversão do texto de dano
+  s.igual(formulaDeDano("3◆"), { formula: "3dlsim" }, "Dano 3◆ vira 3dlsim");
+  s.igual(formulaDeDano("2dl + 1dq"), { formula: "2dlsim + 1dqsim" }, "Dano 2dl + 1dq conta símbolos");
+  s.igual(formulaDeDano("⬟"), { formula: "1dpsim" }, "Dano ⬟ sem número vale 1 dado");
+  s.igual(formulaDeDano(" 4 "), { fixo: 4 }, "Número sozinho é dano fixo");
+  s.igual(formulaDeDano(""), null, "Sem dano: nada a rolar");
+
+  // Compêndio de macros
+  const pack = game.packs.get("assimilacao.macros");
+  s.ok(!!pack, "Compêndio \"Macros do Assimilação\" carregado");
+  if ( pack ) {
+    const docs = await pack.getDocuments();
+    s.igual(docs.length, 6, "Seis macros no compêndio");
+    const chamadas = docs.flatMap(m => [...m.command.matchAll(/game\.assimilacao\.(\w+)/g)].map(r => r[1]));
+    s.ok((chamadas.length === docs.length) && chamadas.every(f => typeof api[f] === "function"),
+      "Cada macro chama uma função existente da API", chamadas.join(", "));
+    s.ok(docs.every(m => (m.type === "script") && m.img), "Macros de script com ícone");
+    s.ok(pack.getUserLevel(game.user) >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER, "Compêndio visível");
+  }
+
+  // Lista de escolha
+  if ( pda ) {
+    const p = EscolherAtor.escolher([ator, pda]);
+    s.ok(await ate(() => acharEscolha()), "Lista de personagens abre");
+    const app = acharEscolha();
+    s.igual(app?.element.querySelectorAll(".asm-escolha").length, 2, "Lista mostra os dois personagens");
+    s.igual(chavesCruas(app?.element.innerHTML ?? ""), [], "Lista sem chaves de idioma faltando");
+    app?.element.querySelectorAll(".asm-escolha button")[1]?.click();
+    s.ok((await p) === pda, "Escolher na lista devolve o personagem certo");
+    const p2 = EscolherAtor.escolher([ator, pda]);
+    await ate(() => acharEscolha());
+    await acharEscolha()?.close();
+    s.ok((await p2) === null, "Fechar a lista sem escolher não abre nada");
+  }
+
+  // abrirTeste com ator explícito
+  const pt = api.abrirTeste({ ator, aptidao: "atletismo" });
+  s.ok(await ate(() => acharApp(ator)), "abrirTeste({ ator }) abre o Montar Teste");
+  s.igual(acharApp(ator)?.estado.aptidao, "atletismo", "abrirTeste repassa a Aptidão");
+  await acharApp(ator)?.close();
+  await pt;
+
+  // abrirTeste sem nada selecionado: GM vê a lista dos personagens do mundo
+  const controlados = canvas?.ready ? [...canvas.tokens.controlled] : [];
+  controlados.forEach(t => t.release());
+  const candidatos = api.atoresDoUsuario();
+  s.ok(candidatos.includes(ator) && candidatos.includes(pda) && !candidatos.includes(am), "Candidatos: Infectados e PdAs, sem Ameaças");
+  const comDono = candidatos.findIndex(a => !a.hasPlayerOwner);
+  s.ok((comDono === -1) || candidatos.slice(comDono).every(a => !a.hasPlayerOwner), "Personagens dos jogadores aparecem primeiro");
+  const pt2 = api.abrirTeste();
+  s.ok(await ate(() => acharEscolha()), "Vários personagens: abrirTeste mostra a lista");
+  const lista = acharEscolha();
+  if ( lista ) {
+    const busca = lista.element.querySelector("input[name=busca]");
+    if ( busca ) {
+      busca.value = "Velho Tonho";
+      busca.dispatchEvent(new Event("input"));
+      const visiveis = [...lista.element.querySelectorAll(".asm-escolha")].filter(li => !li.hidden);
+      s.ok(visiveis.length >= 1 && visiveis.every(li => li.dataset.nome.includes("Velho Tonho")), "Busca filtra a lista pelo nome");
+      busca.value = "";
+      busca.dispatchEvent(new Event("input"));
+    }
+    lista.element.querySelector(`.asm-escolha[data-uuid="${ator.uuid}"] button`)?.click();
+    s.ok(await ate(() => acharApp(ator)), "Escolher na lista abre o Montar Teste desse personagem");
+    await acharApp(ator)?.close();
+  }
+  await pt2;
+  controlados.forEach(t => t.control({ releaseOthers: false }));
+
+  // Renovação de usos e ações em grupo
+  const [usoCena, usoSessao] = await ator.createEmbeddedDocuments("Item", [
+    { type: "caracteristica", name: `${PREFIXO} Armadura`, system: { usos: { value: 0, max: 3, escopo: "cena" } } },
+    { type: "caracteristica", name: `${PREFIXO} Sacrifício`, system: { usos: { value: 0, max: 1, escopo: "sessao" } } }
+  ]);
+  const a = ator.items.find(i => i.name.endsWith("Armadura"));
+  const b = ator.items.find(i => i.name.endsWith("Sacrifício"));
+  let n = game.messages.size;
+  await ator.update({ "system.assimilacao.value": 0 });
+  await api.encerrarCenaGrupo({ confirmar: false, atores: [ator] });
+  s.igual([a.system.usos.value, b.system.usos.value, ator.system.assimilacao.value], [3, 0, ator.system.assimilacao.max],
+    "Fim de cena: e ao máximo e usos por cena renovados (os por sessão não)");
+  s.ok(game.messages.size === n + 1 && game.messages.contents.at(-1).content.includes("aviso-grupo"), "Fim de cena do grupo avisa no chat");
+  await ator.update({ "system.origens.ocupacao.usado": true });
+  await api.novaSessaoGrupo({ confirmar: false, atores: [ator] });
+  s.igual([b.system.usos.value, ator.system.origens.ocupacao.usado], [1, false], "Nova sessão: Origens livres e usos por sessão renovados");
+  await a.update({ "system.usos.value": 0, "system.usos.escopo": "repouso" });
+  await api.repousoGrupo({ confirmar: false, atores: [ator] });
+  s.igual(a.system.usos.value, 3, "Repouso do grupo renova usos por repouso");
+  await ator.deleteEmbeddedDocuments("Item", [a.id, b.id]);
+  s.ok(api.infectadosDoGrupo().every(x => x.type === "infectado"), "Grupo contém só Infectados");
+
+  // Diálogo "Rolar dados"
+  await s.tentar("Diálogo Rolar dados", async () => {
+    n = game.messages.size;
+    await comFaces([9, 7], async () => {
+      const pr = api.rolarDadosDialogo();
+      await ate(() => acharDialogo(".asm-rolar-dados"));
+      const dlg = acharDialogo(".asm-rolar-dados");
+      s.ok(!!dlg, "Diálogo Rolar dados abre");
+      s.igual(chavesCruas(dlg?.element.innerHTML ?? ""), [], "Diálogo Rolar dados sem chaves de idioma faltando");
+      const form = dlg.element.querySelector("form") ?? dlg.element;
+      form.querySelector('input[name="l"]').value = "2";
+      form.querySelector('select[name="tipo"]').value = "dano";
+      form.querySelector('input[name="titulo"]').value = "Mordida";
+      dlg.element.querySelector('button[data-action="ok"]').click();
+      await pr;
+    });
+    s.ok(await ate(() => game.messages.size === n + 1), "Rolar dados manda a rolagem ao chat");
+    const r = game.messages.contents.at(-1).rolls[0];
+    s.igual([r?.options.tipo, r?.options.titulo, r?.total], ["dano", "Mordida", 5], "2◆ de dano (ABC + AA) = 5 pontos, com título");
+  });
+
+  // Pool da Ameaça pela API
+  if ( am ) {
+    n = game.messages.size;
+    await comFaces([1, 1, 1], () => api.rolarPoolAmeaca({ ator: am }));
+    s.ok(await ate(() => game.messages.size === n + 1), "rolarPoolAmeaca rola o pool");
+  }
 }
 
 /* -------------------------------------------- */

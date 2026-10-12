@@ -1,0 +1,21 @@
+<div class="asm-escolher">
+  <p class="asm-nota">{{dica}}</p>
+  {{#if busca}}
+  <input type="search" name="busca" placeholder="{{localize "ASSIMILACAO.Escolher.buscar"}}" aria-label="{{localize "ASSIMILACAO.Escolher.buscar"}}">
+  {{/if}}
+  <ul class="asm-escolha-lista">
+    {{#each atores}}
+    <li class="asm-escolha {{#if meu}}meu{{/if}}" data-uuid="{{uuid}}" data-nome="{{nome}}">
+      <button type="button" data-action="escolher">
+        <img src="{{img}}" alt="">
+        <span class="asm-escolha-textos">
+          <strong>{{nome}}</strong>
+          <small>{{tipo}}{{#if donos}} · {{donos}}{{/if}}{{#if meu}} · {{localize "ASSIMILACAO.Escolher.meu"}}{{/if}}</small>
+          {{#if resumo}}<small class="asm-escolha-resumo">{{resumo}}</small>{{/if}}
+        </span>
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </button>
+    </li>
+    {{/each}}
+  </ul>
+</div>

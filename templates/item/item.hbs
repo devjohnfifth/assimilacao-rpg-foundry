@@ -29,16 +29,49 @@
       {{formGroup systemFields.requisitoE value=source.system.requisitoE}}
       {{formGroup systemFields.cPressao value=source.system.cPressao}}
     {{/if}}
+    {{#if ehAtivacao}}
+      <div class="form-group asm-custo-simbolos">
+        <label>{{localize "ASSIMILACAO.Ativacao.FIELDS.custo.label"}}</label>
+        <div class="form-fields">
+          {{#each simbolos}}
+          <label class="asm-simbolo-campo" data-tooltip="{{rotulo}}">
+            <img src="{{icone}}" alt="{{s}}">
+            <input type="number" name="system.custo.{{s}}" value="{{custo}}" min="0" max="30" step="1" aria-label="{{rotulo}}">
+          </label>
+          {{/each}}
+        </div>
+        <p class="hint">{{localize "ASSIMILACAO.Ativacao.FIELDS.custo.hint"}}</p>
+      </div>
+      <div class="form-group asm-custo-simbolos">
+        <label>{{localize "ASSIMILACAO.Ativacao.FIELDS.progresso.label"}}</label>
+        <div class="form-fields">
+          {{#each simbolos}}
+          <label class="asm-simbolo-campo" data-tooltip="{{rotulo}}">
+            <img src="{{icone}}" alt="{{s}}">
+            <input type="number" name="system.progresso.{{s}}" value="{{progresso}}" min="0" max="{{custo}}" step="1" aria-label="{{rotulo}}">
+          </label>
+          {{/each}}
+        </div>
+      </div>
+      {{formGroup systemFields.dano value=source.system.dano}}
+      {{formGroup systemFields.alvos value=source.system.alvos}}
+      {{formGroup systemFields.unicaVez value=source.system.unicaVez}}
+      {{formGroup systemFields.pagamentoIntegral value=source.system.pagamentoIntegral}}
+      {{formGroup systemFields.requerMunicao value=source.system.requerMunicao}}
+      {{formGroup systemFields.disparos value=source.system.disparos}}
+    {{/if}}
+    {{#if systemFields.usos}}
     <fieldset class="asm-usos-campos">
       <legend>{{localize "ASSIMILACAO.Item.usos"}}</legend>
       {{formGroup systemFields.usos.fields.value value=source.system.usos.value}}
       {{formGroup systemFields.usos.fields.max value=source.system.usos.max}}
       {{formGroup systemFields.usos.fields.escopo value=source.system.usos.escopo localize=true}}
     </fieldset>
+    {{/if}}
   </div>
 
   <div class="asm-bloco-rasgado">
-    <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Item.descricao"}}</h2>
+    <h2 class="asm-faixa-pincel kraft">{{#if ehAtivacao}}{{localize "ASSIMILACAO.Ativacao.efeito"}}{{else}}{{localize "ASSIMILACAO.Item.descricao"}}{{/if}}</h2>
     <prose-mirror name="system.descricao" value="{{source.system.descricao}}" toggled
                   data-document-uuid="{{item.uuid}}">{{{descricaoHTML}}}</prose-mirror>
   </div>

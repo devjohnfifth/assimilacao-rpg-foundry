@@ -1,8 +1,8 @@
 {
   "id": "assimilacao",
   "title": "Assimilação RPG",
-  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG (Editora Assimilar): dados de símbolos ■◆⬟, ficha de Infectado(a) no visual do livro, Cabo de Guerra, Saúde e Teste de Ação com escolha de dados mantidos. Baralhos, Partitura de Conflito e Refúgios em construção.",
-  "version": "0.1.1",
+  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG (Editora Assimilar): dados de símbolos ■◆⬟, ficha de Infectado(a) no visual do livro, Personagens do(a) Assimilador(a), Ameaças com Ativações no visual das partituras, Cabo de Guerra, Saúde, Teste de Ação com escolha de dados mantidos e macros prontas. Baralhos, Partitura de Conflito completa e Refúgios em construção.",
+  "version": "0.2.0",
   "compatibility": {
     "minimum": "13",
     "verified": "14.367"
@@ -36,11 +36,49 @@
       "path": "lang/en.json"
     }
   ],
+  "packs": [
+    {
+      "name": "macros",
+      "label": "Macros do Assimilação",
+      "system": "assimilacao",
+      "path": "packs/macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Assimilação RPG",
+      "sorting": "m",
+      "color": "#0a3a46",
+      "packs": [
+        "macros"
+      ],
+      "folders": []
+    }
+  ],
   "documentTypes": {
     "Actor": {
       "infectado": {
         "htmlFields": [
           "biografia",
+          "notas"
+        ]
+      },
+      "personagem": {
+        "htmlFields": [
+          "biografia",
+          "notas",
+          "segredos.notas"
+        ]
+      },
+      "ameaca": {
+        "htmlFields": [
+          "descricao",
           "notas"
         ]
       }
@@ -57,6 +95,11 @@
         ]
       },
       "mutacao": {
+        "htmlFields": [
+          "descricao"
+        ]
+      },
+      "ativacao": {
         "htmlFields": [
           "descricao"
         ]

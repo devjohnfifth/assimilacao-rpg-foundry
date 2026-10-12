@@ -49,7 +49,7 @@ export class RolagemAssimilacao extends foundry.dice.Roll {
 
   /** Quando todos os dados são mantidos (dano, Teste de Assimilação, pools do GM). */
   get mantemTodos() {
-    return ["dano", "assimilacao", "livre"].includes(this.options.tipo) && !this.options.manterMax;
+    return ["dano", "assimilacao", "livre", "pool"].includes(this.options.tipo) && !this.options.manterMax;
   }
 
   get limitesManter() {
@@ -208,7 +208,8 @@ export class RolagemAssimilacao extends foundry.dice.Roll {
       emConflito: !!o.emConflito,
       consequencia: nivelC ? CONFIG.ASSIMILACAO.CONSEQUENCIAS[nivelC] : "",
       isGM,
-      gmPodeAbaterD: isGM && travado && (o.tipo !== "dano") && res.C > (o.ajustes.cDeterminacao ?? 0) && !!o.ator?.uuid,
+      gmPodeAbaterD: isGM && travado && ["acao", "assimilada"].includes(o.tipo) && res.C > (o.ajustes.cDeterminacao ?? 0) && !!o.ator?.uuid,
+      ehPool: o.tipo === "pool",
       simbolos: CONFIG.ASSIMILACAO.SIMBOLOS
     });
   }

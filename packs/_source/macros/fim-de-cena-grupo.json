@@ -1,0 +1,21 @@
+{
+  "_id": "asmMacroCena0003",
+  "_key": "!macros!asmMacroCena0003",
+  "name": "Fim de Cena (grupo)",
+  "type": "script",
+  "author": null,
+  "img": "icons/svg/door-exit.svg",
+  "scope": "global",
+  "command": "// Fim de cena para todos os Infectados do grupo: recupera os e e renova os usos por rodada e por cena.\n// Como jogador(a), vale só para os seus personagens.\ngame.assimilacao.encerrarCenaGrupo();",
+  "folder": null,
+  "sort": 300000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.367",
+    "systemId": "assimilacao",
+    "systemVersion": "0.2.0"
+  }
+}

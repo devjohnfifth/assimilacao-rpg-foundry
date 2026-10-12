@@ -93,9 +93,36 @@ export const ESCOPOS = {
 /** Escala de consequências por quantidade de C (p. 40). */
 export const CONSEQUENCIAS = ["", "menor", "relevante", "séria", "grave", "crítica", "devastadora"];
 
+/** Nível do grupo para o balanceamento (p. 206–211). */
+export const NIVEIS = {
+  iniciante: "ASSIMILACAO.Nivel.iniciante",
+  intermediario: "ASSIMILACAO.Nivel.intermediario",
+  avancado: "ASSIMILACAO.Nivel.avancado",
+  epico: "ASSIMILACAO.Nivel.epico"
+};
+
+/**
+ * Valor recomendado do pool (■ = 1, ◆ = 2, ⬟ = 3): base + por Infectado (p. 206–208).
+ * Uma Ameaça que é o único gerador do Conflito usa a faixa do Conflito.
+ */
+export const BALANCEAMENTO = {
+  conflito: { iniciante: [3, 1], intermediario: [6, 2], avancado: [9, 3], epico: [12, 4] },
+  ameaca: { iniciante: [2, 1], intermediario: [4, 2], avancado: [6, 3], epico: [8, 4] }
+};
+
+export const VALOR_DADO = { q: 1, l: 2, p: 3 };
+
+/** Relação de um Personagem do(a) Assimilador(a) com o grupo (p. 249). */
+export const RELACOES = {
+  aliado: "ASSIMILACAO.Relacao.aliado",
+  neutro: "ASSIMILACAO.Relacao.neutro",
+  hostil: "ASSIMILACAO.Relacao.hostil",
+  desconhecido: "ASSIMILACAO.Relacao.desconhecido"
+};
+
 export const ASSIMILACAO = {
   FACES, DADOS, SIMBOLOS, INSTINTOS, CONHECIMENTOS, PRATICAS, ADJETIVOS, SAUDE, GERACOES,
-  NAIPES, LOCAIS_INVENTARIO, ESCOPOS, CONSEQUENCIAS,
+  NAIPES, LOCAIS_INVENTARIO, ESCOPOS, CONSEQUENCIAS, NIVEIS, BALANCEAMENTO, VALOR_DADO, RELACOES,
   CABO_TOTAL: 10,
   TETO_MANTIDOS: 4
 };

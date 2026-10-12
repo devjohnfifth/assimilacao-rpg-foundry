@@ -1,4 +1,4 @@
-<header class="asm-cabecalho">
+<header class="asm-cabecalho {{#if ehPersonagem}}personagem relacao-{{source.system.relacao}}{{/if}} {{#if simplificado}}simplificado{{/if}}">
   <div class="asm-retrato-bloco">
     <div class="asm-marca" aria-hidden="true">
       <img src="systems/assimilacao/assets/ui/marca.svg" alt="">
@@ -16,6 +16,28 @@
       <span>{{localize "ASSIMILACAO.Ficha.nome"}}</span>
       <input type="text" name="name" value="{{actor.name}}" {{disabled (not editable)}}>
     </label>
+    {{#if ehPersonagem}}
+    <div class="asm-linha-dupla asm-pda">
+      <label class="asm-campo">
+        <span>{{localize "ASSIMILACAO.Personagem.FIELDS.relacao.label"}}</span>
+        <select name="system.relacao">{{selectOptions relacoes selected=source.system.relacao}}</select>
+      </label>
+      <label class="asm-campo">
+        <span>{{localize "ASSIMILACAO.Personagem.FIELDS.grupo.label"}}</span>
+        <input type="text" name="system.grupo" value="{{source.system.grupo}}" placeholder="{{localize "ASSIMILACAO.Personagem.grupoDica"}}">
+      </label>
+      <label class="asm-check" data-tooltip="{{localize "ASSIMILACAO.Personagem.FIELDS.simplificado.hint"}}">
+        <input type="checkbox" name="system.simplificado" {{checked source.system.simplificado}}>
+        {{localize "ASSIMILACAO.Personagem.FIELDS.simplificado.label"}}
+      </label>
+    </div>
+    {{/if}}
+    {{#if simplificado}}
+    <label class="asm-campo">
+      <span>{{localize "ASSIMILACAO.Ficha.conceito"}}</span>
+      <input type="text" name="system.conceito" value="{{source.system.conceito}}" placeholder="{{localize "ASSIMILACAO.Personagem.conceitoDica"}}">
+    </label>
+    {{else}}
     <div class="asm-subtitulo">{{localize "ASSIMILACAO.Origens.titulo"}}</div>
     <label class="asm-campo">
       <span>{{localize "ASSIMILACAO.Origens.eventoMarcante"}}</span>
@@ -55,5 +77,6 @@
       <span>{{localize "ASSIMILACAO.Propositos.coletivo"}}</span>
       <input type="text" name="system.propositos.coletivo" value="{{source.system.propositos.coletivo}}">
     </label>
+    {{/if}}
   </div>
 </header>

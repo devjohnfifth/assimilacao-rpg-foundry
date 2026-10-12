@@ -1,0 +1,21 @@
+{
+  "_id": "asmMacroAmeaca06",
+  "_key": "!macros!asmMacroAmeaca06",
+  "name": "Rolar Pool da Ameaça",
+  "type": "script",
+  "author": null,
+  "img": "icons/svg/hazard.svg",
+  "scope": "global",
+  "command": "// (GM) Rola o pool da Ameaça do token selecionado, ou escolhe na lista de Ameaças.\ngame.assimilacao.rolarPoolAmeaca();",
+  "folder": null,
+  "sort": 600000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "coreVersion": "14.367",
+    "systemId": "assimilacao",
+    "systemVersion": "0.2.0"
+  }
+}

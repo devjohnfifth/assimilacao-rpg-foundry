@@ -11,6 +11,19 @@
                     data-document-uuid="{{actor.uuid}}">{{{notasHTML}}}</prose-mirror>
     </div>
   </div>
+  {{#if (and ehPersonagem isGM)}}
+  <div class="asm-segredos">
+    <h2 class="asm-faixa-pincel vinho"><i class="fa-solid fa-eye-slash"></i> {{localize "ASSIMILACAO.Personagem.segredos"}}</h2>
+    <p class="asm-nota">{{localize "ASSIMILACAO.Personagem.segredosDica"}}</p>
+    <label class="asm-campo"><span>{{localize "ASSIMILACAO.Personagem.FIELDS.segredos.motivacao.label"}}</span>
+      <input type="text" name="system.segredos.motivacao" value="{{source.system.segredos.motivacao}}" placeholder="{{localize "ASSIMILACAO.Personagem.motivacaoDica"}}"></label>
+    <label class="asm-campo"><span>{{localize "ASSIMILACAO.Personagem.FIELDS.segredos.propositoAntagonista.label"}}</span>
+      <input type="text" name="system.segredos.propositoAntagonista" value="{{source.system.segredos.propositoAntagonista}}" placeholder="{{localize "ASSIMILACAO.Personagem.propositoAntagonistaDica"}}"></label>
+    <prose-mirror name="system.segredos.notas" value="{{source.system.segredos.notas}}" toggled
+                  data-document-uuid="{{actor.uuid}}">{{{segredosHTML}}}</prose-mirror>
+  </div>
+  {{/if}}
+  {{#unless simplificado}}
   <div class="asm-progresso">
     <h2 class="asm-titulo-secao">{{localize "ASSIMILACAO.Ficha.progressao"}}</h2>
     <div class="asm-linha-dupla">
@@ -23,4 +36,5 @@
     <label class="asm-campo"><span>{{localize "ASSIMILACAO.Ficha.cicatrizes"}}</span>
       <input type="text" name="system.cicatrizes" value="{{source.system.cicatrizes}}" placeholder="{{localize "ASSIMILACAO.Ficha.cicatrizesDica"}}"></label>
   </div>
+  {{/unless}}
 </section>

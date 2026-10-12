@@ -58,3 +58,36 @@ export class MutacaoData extends foundry.abstract.TypeDataModel {
     };
   }
 }
+
+/**
+ * Ativação de uma Ameaça ou Conflito (p. 69, 196–225; seção 10.2 da especificação).
+ * O custo é pago com os A, B e C rolados pelo(a) Assimilador(a); o progresso parcial fica registrado.
+ */
+export class AtivacaoData extends foundry.abstract.TypeDataModel {
+  static LOCALIZATION_PREFIXES = ["ASSIMILACAO.Ativacao"];
+  static defineSchema() {
+    const simbolos = () => new f.SchemaField({ A: inteiro(0, 0, 30), B: inteiro(0, 0, 30), C: inteiro(0, 0, 30) });
+    return {
+      custo: simbolos(),
+      progresso: simbolos(),
+      dano: texto(),
+      alvos: texto(),
+      unicaVez: new f.BooleanField({ initial: false }),
+      pagamentoIntegral: new f.BooleanField({ initial: false }),
+      requerMunicao: new f.BooleanField({ initial: false }),
+      disparos: inteiro(0, 0, 999),
+      descricao: new f.HTMLField({ required: true, blank: true, initial: "" })
+    };
+  }
+
+  /** @override */
+  prepareDerivedData() {
+    const c = this.custo;
+    const p = this.progresso;
+    for ( const s of ["A", "B", "C"] ) p[s] = Math.min(p[s], c[s]);
+    this.totalCusto = c.A + c.B + c.C;
+    this.completa = (this.totalCusto > 0) && ["A", "B", "C"].every(s => p[s] >= c[s]);
+    this.esgotada = this.unicaVez && (this.disparos > 0);
+    this.custoTexto = "A".repeat(c.A) + "B".repeat(c.B) + "C".repeat(c.C);
+  }
+}
