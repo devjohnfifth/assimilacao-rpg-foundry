@@ -1,0 +1,159 @@
+<section class="tab asm-partitura {{tab.cssClass}}" data-group="primary" data-tab="partitura">
+
+  <header class="asm-pt-titulo">
+    <img class="asm-pt-retrato" src="{{actor.img}}" data-action="editImage" data-edit="img" alt="{{actor.name}}" data-tooltip="{{localize "ASSIMILACAO.Ficha.retrato"}}">
+    <span class="asm-pt-tipo">{{localize "TYPES.Actor.conflito"}}</span>
+    <input class="asm-pt-nome" type="text" name="name" value="{{actor.name}}" aria-label="{{localize "ASSIMILACAO.Ficha.nome"}}">
+    <span class="asm-pt-pool" data-tooltip="{{localize "ASSIMILACAO.Ameaca.valorDica"}}">{{poolTexto}}</span>
+  </header>
+  <div class="asm-pt-subtitulo">
+    <input type="text" name="system.conceito" value="{{source.system.conceito}}" placeholder="{{localize "ASSIMILACAO.Conflito.conceitoDica"}}">
+  </div>
+
+  {{#if cenaAtiva}}
+  <div class="asm-pt-andamento">
+    <span><i class="fa-solid fa-circle-play"></i> {{localize "ASSIMILACAO.Partitura.emAndamento"}} · {{localize "ASSIMILACAO.Partitura.rodada"}} {{sys.cena.rodada}} · {{faseRotulo}}</span>
+    <button type="button" class="primario" data-action="abrirPartitura"><i class="fa-solid fa-scroll"></i> {{localize "ASSIMILACAO.Partitura.abrir"}}</button>
+  </div>
+  {{/if}}
+  {{#if temSaldo}}
+  <div class="asm-saldo" data-tooltip="{{localize "ASSIMILACAO.Partitura.saldoDica"}}">
+    <span class="asm-saldo-rotulo">{{localize "ASSIMILACAO.Partitura.saldo"}}</span>
+    {{#each saldo}}<span class="asm-saldo-item simbolo-{{s}}"><img src="{{icone}}" alt="{{s}}"> {{n}}</span>{{/each}}
+  </div>
+  {{/if}}
+
+  {{!-- Condicionantes --}}
+  <div class="asm-pt-linha condicionantes">
+    <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.condicionantes"}}</div>
+    <div class="asm-pt-conteudo">
+      {{#each condicionantes}}
+      <article class="asm-pt-condicionante {{#unless system.ativa}}inativa{{/unless}}" data-item-id="{{id}}">
+        <div class="asm-pt-ativ-cab">
+          <span class="asm-pt-ativ-nome" data-action="editarItem">{{name}}</span>
+          {{#if system.termino}}<span class="asm-tag" data-tooltip="{{localize "ASSIMILACAO.Condicionante.FIELDS.termino.label"}}"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> {{system.termino}}</span>{{/if}}
+          {{#if @root.editable}}
+          <span class="asm-item-controles">
+            <a data-action="alternarCondicionante" data-tooltip="{{localize "ASSIMILACAO.Condicionante.alternar"}}" aria-label="{{localize "ASSIMILACAO.Condicionante.alternar"}}"><i class="fa-solid {{#if system.ativa}}fa-toggle-on{{else}}fa-toggle-off{{/if}}"></i></a>
+            <a data-action="editarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.editar"}}" aria-label="{{localize "ASSIMILACAO.Ficha.editar"}}"><i class="fa-solid fa-pen"></i></a>
+            <a data-action="apagarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.remover"}}" aria-label="{{localize "ASSIMILACAO.Ficha.remover"}}"><i class="fa-solid fa-trash"></i></a>
+          </span>
+          {{/if}}
+        </div>
+        {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
+      </article>
+      {{else}}
+      <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Conflito.semCondicionantes"}}</p>
+      {{/each}}
+      {{#if editable}}<button type="button" class="asm-pt-adicionar" data-action="criarCondicionante"><i class="fa-solid fa-plus"></i> {{localize "ASSIMILACAO.Conflito.novaCondicionante"}}</button>{{/if}}
+    </div>
+  </div>
+
+  {{!-- Ativações do Conflito --}}
+  <div class="asm-pt-linha">
+    <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Ameaca.ativacoesConflito"}}</div>
+    <div class="asm-pt-conteudo">
+      {{#each ativacoes}}
+      {{> ativacao this dono=@root.actor.id editavel=@root.editable apagavel=true}}
+      {{else}}
+      <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Ameaca.semAtivacoes"}}</p>
+      {{/each}}
+      {{#if editable}}<button type="button" class="asm-pt-adicionar" data-action="criarAtivacao"><i class="fa-solid fa-plus"></i> {{localize "ASSIMILACAO.Ameaca.novaAtivacao"}}</button>{{/if}}
+    </div>
+  </div>
+
+  {{!-- Objetivos --}}
+  <div class="asm-pt-linha objetivos">
+    <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.objetivosPrincipais"}}</div>
+    <div class="asm-pt-conteudo">
+      {{#each principais}}{{> objetivoMontagem}}{{else}}<p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Conflito.semObjetivos"}}</p>{{/each}}
+      {{#if editable}}<button type="button" class="asm-pt-adicionar" data-action="criarObjetivo" data-categoria="principal"><i class="fa-solid fa-plus"></i> {{localize "ASSIMILACAO.Conflito.novoPrincipal"}}</button>{{/if}}
+    </div>
+  </div>
+  <div class="asm-pt-linha objetivos secundarios">
+    <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.objetivosSecundarios"}}</div>
+    <div class="asm-pt-conteudo">
+      {{#each secundarios}}{{> objetivoMontagem}}{{else}}<p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Conflito.semSecundarios"}}</p>{{/each}}
+      {{#if editable}}<button type="button" class="asm-pt-adicionar" data-action="criarObjetivo" data-categoria="secundario"><i class="fa-solid fa-plus"></i> {{localize "ASSIMILACAO.Conflito.novoSecundario"}}</button>{{/if}}
+    </div>
+  </div>
+
+  {{!-- Ameaças --}}
+  <div class="asm-pt-linha ameacas">
+    <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.ameacas"}}</div>
+    <div class="asm-pt-conteudo">
+      {{#each ameacas}}
+      <article class="asm-pt-ameaca-vinculo {{#if neutralizada}}neutralizada{{/if}}" data-ameaca="{{id}}">
+        <img src="{{img}}" alt="" data-action="abrirAmeaca">
+        <span class="asm-pt-ativ-nome" data-action="abrirAmeaca">{{name}}</span>
+        <span class="asm-pt-custo-texto">{{poolTexto}}</span>
+        <span class="asm-tag" data-tooltip="{{localize "ASSIMILACAO.Ameaca.neutralizacao"}}">{{neutralizacao}} A</span>
+        {{#if @root.editable}}
+        <span class="asm-item-controles">
+          {{#unless primeiro}}<a data-action="moverAmeaca" data-passo="-1" data-tooltip="{{localize "ASSIMILACAO.Partitura.agirAntes"}}" aria-label="{{localize "ASSIMILACAO.Partitura.agirAntes"}}"><i class="fa-solid fa-arrow-up"></i></a>{{/unless}}
+          {{#unless ultimo}}<a data-action="moverAmeaca" data-passo="1" data-tooltip="{{localize "ASSIMILACAO.Partitura.agirDepois"}}" aria-label="{{localize "ASSIMILACAO.Partitura.agirDepois"}}"><i class="fa-solid fa-arrow-down"></i></a>{{/unless}}
+          <a data-action="desvincularAmeaca" data-tooltip="{{localize "ASSIMILACAO.Conflito.desvincular"}}" aria-label="{{localize "ASSIMILACAO.Conflito.desvincular"}}"><i class="fa-solid fa-link-slash"></i></a>
+        </span>
+        {{/if}}
+      </article>
+      {{else}}
+      <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Conflito.semAmeacas"}}</p>
+      {{/each}}
+      {{#if editable}}
+      <button type="button" class="asm-pt-adicionar" data-action="novaAmeaca"><i class="fa-solid fa-plus"></i> {{localize "ASSIMILACAO.Conflito.novaAmeaca"}}</button>
+      <p class="asm-nota">{{localize "ASSIMILACAO.Conflito.arrasteAmeaca"}}</p>
+      {{/if}}
+    </div>
+  </div>
+
+  <footer class="asm-pt-controle">
+    <div class="asm-pt-pool-campos">
+      <label>■ <input type="number" name="system.pool.q" value="{{source.system.pool.q}}" min="0" max="30" step="1" aria-label="{{localize "ASSIMILACAO.Ameaca.FIELDS.pool.q.label"}}"></label>
+      <label>◆ <input type="number" name="system.pool.l" value="{{source.system.pool.l}}" min="0" max="30" step="1" aria-label="{{localize "ASSIMILACAO.Ameaca.FIELDS.pool.l.label"}}"></label>
+      <label>⬟ <input type="number" name="system.pool.p" value="{{source.system.pool.p}}" min="0" max="30" step="1" aria-label="{{localize "ASSIMILACAO.Ameaca.FIELDS.pool.p.label"}}"></label>
+      <button type="button" data-action="rolarPool"><i class="fa-solid fa-dice"></i> {{localize "ASSIMILACAO.Ameaca.rolarPool"}}</button>
+    </div>
+    <div class="asm-pt-balanco balanco-{{sys.balanco}}">
+      <label>{{localize "ASSIMILACAO.Ameaca.FIELDS.nivel.label"}}
+        <select name="system.nivel">{{selectOptions niveis selected=source.system.nivel}}</select></label>
+      <label>{{localize "ASSIMILACAO.Ameaca.FIELDS.infectadosPresentes.label"}}
+        <input type="number" name="system.infectadosPresentes" value="{{source.system.infectadosPresentes}}" min="1" max="12" step="1"></label>
+      <label>{{localize "ASSIMILACAO.Conflito.FIELDS.escala.label"}}
+        <select name="system.escala">{{selectOptions escalas selected=source.system.escala}}</select></label>
+      <span class="asm-pt-valor" data-tooltip="{{localize "ASSIMILACAO.Ameaca.valorDica"}}">
+        {{localize "ASSIMILACAO.Ameaca.valor"}} <strong>{{sys.valorPool}}</strong> ·
+        {{localize "ASSIMILACAO.Ameaca.recomendado"}} <strong>{{sys.recomendado}}</strong>
+        <em>({{balancoRotulo}})</em>
+      </span>
+    </div>
+    <div class="asm-pt-balanco">
+      <label>{{localize "ASSIMILACAO.Conflito.FIELDS.intencao.label"}}
+        <select name="system.intencao">{{selectOptions intencoes selected=source.system.intencao}}</select></label>
+      <label>{{localize "ASSIMILACAO.Conflito.FIELDS.dificuldade.label"}}
+        <select name="system.dificuldade">{{selectOptions dificuldades selected=source.system.dificuldade blank=dificuldadeMundo}}</select></label>
+      <label>{{localize "ASSIMILACAO.Conflito.FIELDS.recompensaXP.label"}}
+        <input type="number" name="system.recompensaXP" value="{{source.system.recompensaXP}}" min="0" max="6" step="1"></label>
+    </div>
+    <p class="asm-nota manuscrita">{{dicaIntencao}}</p>
+    <div class="asm-pt-balanco">
+      <label class="asm-campo-largo">{{localize "ASSIMILACAO.Conflito.FIELDS.duracaoRodada.label"}}
+        <input type="text" name="system.duracaoRodada" value="{{source.system.duracaoRodada}}" placeholder="{{localize "ASSIMILACAO.Conflito.duracaoDica"}}"></label>
+      <label class="asm-check" data-tooltip="{{localize "ASSIMILACAO.Conflito.FIELDS.aberta.hint"}}">
+        <input type="checkbox" name="system.aberta" {{checked source.system.aberta}}> {{localize "ASSIMILACAO.Conflito.FIELDS.aberta.label"}}</label>
+    </div>
+    {{#if avisos.length}}
+    <ul class="asm-pt-avisos">{{#each avisos}}<li>{{this}}</li>{{/each}}</ul>
+    {{/if}}
+    {{#if isGM}}
+    <div class="asm-pt-acoes">
+      {{#if cenaAtiva}}
+      <button type="button" class="primario" data-action="abrirPartitura"><i class="fa-solid fa-scroll"></i> {{localize "ASSIMILACAO.Partitura.abrir"}}</button>
+      <button type="button" data-action="encerrarConflito"><i class="fa-solid fa-flag-checkered"></i> {{localize "ASSIMILACAO.Partitura.encerrarBotao"}}</button>
+      {{else}}
+      <button type="button" class="primario" data-action="iniciarConflito"><i class="fa-solid fa-play"></i> {{localize "ASSIMILACAO.Partitura.iniciarBotao"}}</button>
+      <button type="button" data-action="abrirPartitura"><i class="fa-solid fa-scroll"></i> {{localize "ASSIMILACAO.Partitura.verPartitura"}}</button>
+      {{/if}}
+    </div>
+    {{/if}}
+  </footer>
+</section>

@@ -120,9 +120,55 @@ export const RELACOES = {
   desconhecido: "ASSIMILACAO.Relacao.desconhecido"
 };
 
+/** Intenção do Conflito (p. 207): orienta o peso das Ativações de A e de C. */
+export const INTENCOES = {
+  hostil: "ASSIMILACAO.Intencao.hostil",
+  neutra: "ASSIMILACAO.Intencao.neutra",
+  amigavel: "ASSIMILACAO.Intencao.amigavel"
+};
+
+/** Escala do Conflito (p. 208): Simples ou Clímax. */
+export const ESCALAS = {
+  simples: "ASSIMILACAO.Escala.simples",
+  climax: "ASSIMILACAO.Escala.climax"
+};
+
+/** Dificuldades de jogo (p. 211; seção 3.8): ⬟ extras rolados em todo pool de Conflito e Ameaça. */
+export const DIFICULDADES = {
+  exploracao: { rotulo: "ASSIMILACAO.Dificuldade.exploracao", extra: 0 },
+  sofrimento: { rotulo: "ASSIMILACAO.Dificuldade.sofrimento", extra: 1 },
+  desastre: { rotulo: "ASSIMILACAO.Dificuldade.desastre", extra: 2 },
+  colapso: { rotulo: "ASSIMILACAO.Dificuldade.colapso", extra: 3 }
+};
+
+/** Objetivos (p. 199–205; seção 10.2). */
+export const CATEGORIAS_OBJETIVO = {
+  principal: "ASSIMILACAO.Objetivo.categoria.principal",
+  secundario: "ASSIMILACAO.Objetivo.categoria.secundario"
+};
+export const ACUMULOS = {
+  coletivo: "ASSIMILACAO.Objetivo.acumulo.coletivo",
+  individual: "ASSIMILACAO.Objetivo.acumulo.individual"
+};
+export const REPETICOES = {
+  unica: "ASSIMILACAO.Objetivo.repeticao.unica",
+  porInfectado: "ASSIMILACAO.Objetivo.repeticao.porInfectado",
+  multipla: "ASSIMILACAO.Objetivo.repeticao.multipla"
+};
+
+/** Fases de uma rodada de Conflito (p. 69–72; seção 10.4). */
+export const FASES = {
+  preparacao: "ASSIMILACAO.Fase.preparacao",
+  infectados: "ASSIMILACAO.Fase.infectados",
+  assimilador: "ASSIMILACAO.Fase.assimilador",
+  fim: "ASSIMILACAO.Fase.fim",
+  encerrado: "ASSIMILACAO.Fase.encerrado"
+};
+
 export const ASSIMILACAO = {
   FACES, DADOS, SIMBOLOS, INSTINTOS, CONHECIMENTOS, PRATICAS, ADJETIVOS, SAUDE, GERACOES,
   NAIPES, LOCAIS_INVENTARIO, ESCOPOS, CONSEQUENCIAS, NIVEIS, BALANCEAMENTO, VALOR_DADO, RELACOES,
+  INTENCOES, ESCALAS, DIFICULDADES, CATEGORIAS_OBJETIVO, ACUMULOS, REPETICOES, FASES,
   CABO_TOTAL: 10,
   TETO_MANTIDOS: 4
 };

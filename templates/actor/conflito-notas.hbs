@@ -1,0 +1,14 @@
+<section class="tab asm-notas {{tab.cssClass}}" data-group="primary" data-tab="notas">
+  <div class="asm-bloco-rasgado">
+    <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Conflito.FIELDS.descricao.label"}}</h2>
+    <prose-mirror name="system.descricao" value="{{source.system.descricao}}" toggled
+                  data-document-uuid="{{actor.uuid}}">{{{descricaoHTML}}}</prose-mirror>
+  </div>
+  <label class="asm-campo"><span>{{localize "ASSIMILACAO.Conflito.FIELDS.recompensas.label"}}</span>
+    <input type="text" name="system.recompensas" value="{{source.system.recompensas}}" placeholder="{{localize "ASSIMILACAO.Ameaca.recompensasDica"}}"></label>
+  <div class="asm-bloco-rasgado">
+    <h2 class="asm-faixa-pincel kraft">{{localize "ASSIMILACAO.Ficha.anotacoes"}}</h2>
+    <prose-mirror name="system.notas" value="{{source.system.notas}}" toggled
+                  data-document-uuid="{{actor.uuid}}">{{{notasHTML}}}</prose-mirror>
+  </div>
+</section>

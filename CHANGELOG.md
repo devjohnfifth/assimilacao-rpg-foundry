@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 0.3.0
+- Partitura de Conflito completa: novo ator Conflito (pool, Condicionantes, Ativações, Objetivos, Ameaças vinculadas)
+  e janela da cena para GM e jogadores, com rodadas, fases, presentes, fuga individual e registro.
+- Novos itens: Objetivo (custo por Infectado, coletivo ou individual, uma vez, por Infectado ou repetível, vínculo
+  com a Neutralização de uma Ameaça) e Condicionante.
+- Saldo do(a) Assimilador(a): pools rolados viram A/B/C a investir nas casas; desmarcar devolve ao saldo; a fase não
+  avança com A ou C sobrando nem com Ativação completa sem disparar.
+- Dificuldades de jogo (Exploração, Sofrimento, Desastre, Colapso) com ⬟ extras e escolha dos mantidos.
+- Card de teste em Conflito: botões para investir os A nos Objetivos e na Neutralização; GM leva as C para a partitura.
+- Card de dano: GM aplica o dano aos tokens marcados como alvo.
+- Ameaça pode virar o próprio Conflito com um clique.
+- Macro "Abrir Partitura de Conflito".
+
 ## 0.2.0
 - Personagens do(a) Assimilador(a) (NPCs): relação com o grupo, grupo, segredos só do GM e ficha simplificada.
 - Ameaças: ficha no visual da partitura, pool próprio, Ativações com casas de custo, disparo com dano rolado ou fixo,

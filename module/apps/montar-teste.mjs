@@ -1,4 +1,5 @@
 import { RolagemAssimilacao } from "../dice/roll.mjs";
+import { estaNoConflito } from "../conflito/motor.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -21,7 +22,8 @@ export class MontarTeste extends HandlebarsApplicationMixin(ApplicationV2) {
       origemEvento: false,
       origemOcupacao: false,
       empenho: false,
-      emConflito: !!game.combat?.started,
+      // Num Conflito em andamento, quem está na cena testa "em Conflito" (B não anula C; A vão para Objetivos)
+      emConflito: opcoes.emConflito ?? (estaNoConflito(actor) || !!game.combat?.started),
       extraQ: 0, extraL: 0, extraP: 0,
       manterExtra: 0,
       intencao: ""

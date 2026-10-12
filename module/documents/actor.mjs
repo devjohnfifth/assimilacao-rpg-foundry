@@ -1,12 +1,14 @@
 import { MontarTeste } from "../apps/montar-teste.mjs";
 import { RolagemAssimilacao } from "../dice/roll.mjs";
 import { simbolosHTML } from "../helpers/enricher.mjs";
+import { aplicarSaldo, conflitoAtivo, registrar } from "../conflito/motor.mjs";
 
 /** Padrões do token por tipo de ator (aplicados só ao criar, sem sobrescrever o que já veio nos dados). */
 const TOKEN_PADRAO = {
   infectado: { actorLink: true, disposition: "FRIENDLY", bar1: "saude", bar2: "determinacao" },
   personagem: { actorLink: false, disposition: "NEUTRAL", bar1: "saude", bar2: "determinacao" },
-  ameaca: { actorLink: false, disposition: "HOSTILE", bar1: "neutralizacao", bar2: null }
+  ameaca: { actorLink: false, disposition: "HOSTILE", bar1: "neutralizacao", bar2: null },
+  conflito: { actorLink: true, disposition: "HOSTILE", bar1: null, bar2: null }
 };
 
 /** Converte o texto de dano de uma Ativação em fórmula: "3◆", "2dl + 1dq" ou um número (dano fixo). */
@@ -27,7 +29,8 @@ export function formulaDeDano(texto) {
 export class AtorAssimilacao extends Actor {
 
   static ICONES = {
-    ameaca: "icons/svg/hazard.svg"
+    ameaca: "icons/svg/hazard.svg",
+    conflito: "icons/svg/combat.svg"
   };
 
   /** @override */
@@ -51,14 +54,30 @@ export class AtorAssimilacao extends Actor {
     this.updateSource(upd);
   }
 
+  /** Todo Conflito novo já nasce com o Objetivo "Fuga" (p. 199, 208), editável. */
+  _onCreate(data, options, userId) {
+    super._onCreate(data, options, userId);
+    if ( (game.user.id !== userId) || (this.type !== "conflito") || options.asmSemFuga ) return;
+    if ( this.items.some(i => i.type === "objetivo") ) return;
+    this.createEmbeddedDocuments("Item", [{
+      type: "objetivo", name: game.i18n.localize("ASSIMILACAO.Objetivo.fugaNome"),
+      system: { categoria: "principal", fuga: true, acumulo: "individual", repeticao: "porInfectado", custo: { base: 2 } }
+    }]);
+  }
+
   /* -------------------------------------------- */
   /*  Ameaças                                     */
   /* -------------------------------------------- */
 
-  /** Rola o pool da Ameaça, mantendo todos os dados (p. 70). */
+  /**
+   * Rola o pool do Conflito ou da Ameaça, mantendo todos os dados (p. 70). Com dificuldade elevada
+   * (p. 211), rola os ⬟ extras e o(a) GM escolhe no card quais manter (só a quantidade base).
+   * Os símbolos mantidos vão para o saldo a investir.
+   */
   async rolarPool() {
-    if ( this.type !== "ameaca" ) return null;
-    const { q, l, p } = this.system.pool;
+    if ( !["ameaca", "conflito"].includes(this.type) ) return null;
+    const sys = this.system;
+    const { q, l, p } = sys.pool;
     const termos = [];
     if ( q ) termos.push(`${q}dq`);
     if ( l ) termos.push(`${l}dl`);
@@ -67,15 +86,63 @@ export class AtorAssimilacao extends Actor {
       ui.notifications.warn(game.i18n.localize("ASSIMILACAO.Teste.semDados"));
       return null;
     }
-    const roll = new RolagemAssimilacao(termos.join(" + "), {}, {
+    const extra = sys.extraDificuldade ?? 0;
+    const opcoes = {
       tipo: "pool",
       autor: game.user.id,
+      dono: this.uuid,
       ator: { uuid: this.uuid, nome: this.name, img: this.img },
       titulo: `${game.i18n.localize("ASSIMILACAO.Ameaca.pool")}: ${this.name}`
-    });
+    };
+    if ( extra ) {
+      termos.push(`${extra}dp[${game.i18n.localize("ASSIMILACAO.Rolagem.tagDificuldade")}]`);
+      Object.assign(opcoes, { manterMin: q + l + p, manterMax: q + l + p, mantidos: [], travado: false });
+    }
+    const roll = new RolagemAssimilacao(termos.join(" + "), {}, opcoes);
     await roll.evaluate();
+    if ( roll.mantemTodos ) await aplicarSaldo(roll);
     await roll.toMessage({ speaker: ChatMessage.getSpeaker({ actor: this }) });
     return roll;
+  }
+
+  /**
+   * "Se uma Ameaça é o único gerador do Conflito, ela se torna o próprio Conflito" (p. 197):
+   * cria um Conflito com o pool e as Ativações dela, a Neutralização como Objetivo Principal e a Fuga.
+   */
+  async criarConflito() {
+    if ( (this.type !== "ameaca") || !game.user.isGM ) return null;
+    const s = this.system;
+    const conflito = await Actor.create({
+      name: this.name, type: "conflito", img: this.img, folder: this.folder?.id ?? null,
+      system: {
+        conceito: s.interesses, nivel: s.nivel, pool: { ...s.pool },
+        infectadosPresentes: s.infectadosPresentes, dificuldade: s.dificuldade,
+        recompensas: s.recompensas, descricao: s.descricao
+      }
+    });
+    if ( !conflito ) return null;
+    const zero = { A: 0, B: 0, C: 0 };
+    const ativacoes = this.items.filter(i => i.type === "ativacao").map(i => {
+      const dados = i.toObject();
+      delete dados._id;
+      dados.system.progresso = zero;
+      dados.system.disparos = 0;
+      return dados;
+    });
+    const esc = t => foundry.utils.escapeHTML(String(t ?? ""));
+    const neutralizar = {
+      type: "objetivo",
+      name: game.i18n.format("ASSIMILACAO.Partitura.neutralizar", { nome: this.name }),
+      system: {
+        categoria: "principal",
+        custo: { base: s.neutralizacao.base, porInfectadoExtra: s.neutralizacao.porInfectado },
+        restricao: s.neutralizacao.especial,
+        descricao: s.neutralizacao.consequencia ? `<p>${esc(s.neutralizacao.consequencia)}</p>` : ""
+      }
+    };
+    await conflito.createEmbeddedDocuments("Item", [...ativacoes, neutralizar]);
+    await this.update({ "system.ehOProprioConflito": true });
+    return conflito;
   }
 
   /**
@@ -125,6 +192,10 @@ export class AtorAssimilacao extends Actor {
       }
     }
     await ativacao.update({ "system.progresso": { A: 0, B: 0, C: 0 }, "system.disparos": sys.disparos + 1 });
+    const conflito = conflitoAtivo();
+    if ( conflito && ((conflito.id === this.id) || conflito.system.ameacas.includes(this.id)) ) {
+      await registrar(conflito, game.i18n.format("ASSIMILACAO.Partitura.logDisparou", { nome: ativacao.name, dono: this.name }));
+    }
     return ativacao;
   }
 

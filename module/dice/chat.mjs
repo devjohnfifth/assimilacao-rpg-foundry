@@ -1,4 +1,5 @@
 import { RolagemAssimilacao } from "./roll.mjs";
+import { aplicarSaldo, levarCParaPartitura, pedirInvestimento } from "../conflito/motor.mjs";
 
 /**
  * Interações do card de rolagem (escolha de dados, uso de B, painel do GM).
@@ -16,7 +17,8 @@ export function registrarChat() {
       if ( !alvo || !card.contains(alvo) ) return;
       ev.preventDefault();
       ev.stopPropagation();
-      tratarAcao(message, alvo.dataset.acao, alvo.dataset).catch(err => {
+      const dataset = { ...alvo.dataset, todos: ev.shiftKey };
+      tratarAcao(message, alvo.dataset.acao, dataset).catch(err => {
         console.error("Assimilação | erro na ação do card", err);
         ui.notifications.error(err.message);
       });
@@ -54,6 +56,19 @@ async function tratarAcao(message, acao, dataset) {
       aj.cDeterminacao = (aj.cDeterminacao ?? 0) + 1;
       return salvar(message, roll);
     }
+    if ( acao === "gm-c-partitura" ) {
+      const n = await levarCParaPartitura(message);
+      if ( n ) ui.notifications.info(game.i18n.format("ASSIMILACAO.Rolagem.cLevadasAviso", { n }));
+      return;
+    }
+    if ( acao === "gm-aplicar-dano" ) {
+      const total = roll.resultado.bruto.A + roll.resultado.bruto.B + roll.resultado.bruto.C;
+      const alvos = [...game.user.targets].map(t => t.actor).filter(a => a?.aplicarDano && a.system?.saude);
+      if ( !alvos.length ) return ui.notifications.warn(game.i18n.localize("ASSIMILACAO.Rolagem.semAlvos"));
+      for ( const a of alvos ) await a.aplicarDano(total);
+      o.aplicadoEm = [...(o.aplicadoEm ?? []), ...alvos.map(a => a.name)];
+      return salvar(message, roll);
+    }
     if ( acao === "gm-reverter" ) {
       aj.bAnulaC = 0;
       aj.bIgnoraPen = 0;
@@ -65,6 +80,14 @@ async function tratarAcao(message, acao, dataset) {
 
   if ( !podeEditar(message) ) {
     return ui.notifications.warn(game.i18n.localize("ASSIMILACAO.Avisos.naoDono"));
+  }
+
+  // Investir A num Objetivo ou na Neutralização (Shift: todos os A restantes)
+  if ( acao === "investir" ) {
+    const investidos = (o.investimentos ?? []).reduce((t, i) => t + i.A, 0);
+    const restam = Math.max(0, roll.resultado.A - investidos);
+    const n = dataset.todos ? restam : 1;
+    return pedirInvestimento(message, dataset.destino, n);
   }
 
   switch ( acao ) {
@@ -98,6 +121,7 @@ async function tratarAcao(message, acao, dataset) {
       }
       o.travado = true;
       roll.aplicarDescartes();
+      if ( (o.tipo === "pool") && o.dono ) await aplicarSaldo(roll);
       return salvar(message, roll);
     }
     case "b-anula-c": {

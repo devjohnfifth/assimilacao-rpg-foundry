@@ -2,7 +2,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;
 
 /**
- * Ficha genérica de Item (Característica, Equipamento, Mutação, Ativação de Ameaça).
+ * Ficha genérica de Item (Característica, Equipamento, Mutação, Ativação, Objetivo e Condicionante).
  */
 export class FichaItem extends HandlebarsApplicationMixin(ItemSheetV2) {
   static DEFAULT_OPTIONS = {
@@ -28,6 +28,18 @@ export class FichaItem extends HandlebarsApplicationMixin(ItemSheetV2) {
     context.ehEquipamento = item.type === "equipamento";
     context.ehMutacao = item.type === "mutacao";
     context.ehAtivacao = item.type === "ativacao";
+    context.ehObjetivo = item.type === "objetivo";
+    context.ehCondicionante = item.type === "condicionante";
+    if ( context.ehObjetivo ) {
+      const dono = item.actor;
+      const ids = dono?.type === "conflito" ? dono.system.ameacas : null;
+      const ameacas = game.actors.filter(a => (a.type === "ameaca") && (!ids || ids.includes(a.id) || a.id === item.system.ameaca));
+      context.ameacasOpcoes = Object.fromEntries(ameacas.map(a => [a.id, a.name]));
+      context.nenhumaAmeaca = game.i18n.localize("ASSIMILACAO.Objetivo.semAmeaca");
+      context.custoResumo = game.i18n.format("ASSIMILACAO.Objetivo.resumoMeta", {
+        meta: item.system.meta, n: item.system.presentes
+      });
+    }
     if ( context.ehAtivacao ) {
       const S = CONFIG.ASSIMILACAO.SIMBOLOS;
       context.simbolos = ["A", "B", "C"].map(s => ({

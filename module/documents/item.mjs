@@ -6,7 +6,9 @@ export class ItemAssimilacao extends Item {
     caracteristica: "icons/svg/aura.svg",
     equipamento: "icons/svg/item-bag.svg",
     mutacao: "icons/svg/biohazard.svg",
-    ativacao: "icons/svg/lightning.svg"
+    ativacao: "icons/svg/lightning.svg",
+    objetivo: "icons/svg/target.svg",
+    condicionante: "icons/svg/clockwork.svg"
   };
 
   /** @override */

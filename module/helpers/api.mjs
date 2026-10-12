@@ -4,6 +4,8 @@
  */
 import { EscolherAtor } from "../apps/escolher-ator.mjs";
 import { RolagemAssimilacao } from "../dice/roll.mjs";
+import { PartituraConflito } from "../apps/partitura-conflito.mjs";
+import { conflitoAtivo } from "../conflito/motor.mjs";
 
 const TIPOS_TESTE = ["infectado", "personagem"];
 const loc = k => game.i18n.localize(k);
@@ -178,4 +180,18 @@ export async function rolarPoolAmeaca({ ator } = {}) {
   ator ??= await escolherAtor({ tipos: ["ameaca"], titulo: loc("ASSIMILACAO.Escolher.tituloAmeaca") });
   if ( !ator ) return null;
   return ator.rolarPool();
+}
+
+/* -------------------------------------------- */
+/*  Conflito                                    */
+/* -------------------------------------------- */
+
+/** Abre a Partitura do Conflito em andamento (ou de um Conflito dado). */
+export function abrirPartitura(conflito) {
+  conflito ??= conflitoAtivo();
+  if ( !conflito ) {
+    ui.notifications.info(loc("ASSIMILACAO.Partitura.nenhumAtivo"));
+    return null;
+  }
+  return PartituraConflito.abrir(conflito);
 }

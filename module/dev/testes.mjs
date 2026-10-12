@@ -12,6 +12,9 @@ import { FichaItem } from "../sheets/item-sheet.mjs";
 import { FichaAmeaca } from "../sheets/ameaca-sheet.mjs";
 import { EscolherAtor } from "../apps/escolher-ator.mjs";
 import { formulaDeDano } from "../documents/actor.mjs";
+import { FichaConflito } from "../sheets/conflito-sheet.mjs";
+import { PartituraConflito } from "../apps/partitura-conflito.mjs";
+import * as motor from "../conflito/motor.mjs";
 
 const PREFIXO = "[TESTE]";
 
@@ -101,6 +104,8 @@ export async function executar({ limpar = true } = {}) {
   window.addEventListener("error", aoErro);
   window.addEventListener("unhandledrejection", aoRejeitar);
   const tetoOriginal = game.settings.get("assimilacao", "tetoMantidos");
+  const conflitoOriginal = game.settings.get("assimilacao", "conflitoAtivo");
+  const dificuldadeOriginal = game.settings.get("assimilacao", "dificuldade");
   const idsMsgAntes = new Set(game.messages.map(m => m.id));
   ui.notifications.info("Assimilação: rodando os testes automáticos…");
   const t0 = performance.now();
@@ -119,6 +124,7 @@ export async function executar({ limpar = true } = {}) {
       const pda = await testarPdA(s, criados);
       const ameaca = await testarAmeaca(s, criados);
       await testarApi(s, ator, pda, ameaca, criados);
+      await testarConflito(s, ator, pda, ameaca, criados);
     }
     await testarTextos(s);
   } catch(err) {
@@ -126,6 +132,10 @@ export async function executar({ limpar = true } = {}) {
     s.ok(false, "Execução interrompida por erro inesperado", `${err.name}: ${err.message}`);
   } finally {
     await game.settings.set("assimilacao", "tetoMantidos", tetoOriginal);
+    await game.settings.set("assimilacao", "dificuldade", dificuldadeOriginal);
+    if ( game.settings.get("assimilacao", "conflitoAtivo") !== conflitoOriginal ) {
+      await game.settings.set("assimilacao", "conflitoAtivo", conflitoOriginal);
+    }
     window.removeEventListener("error", aoErro);
     window.removeEventListener("unhandledrejection", aoRejeitar);
     console.error = consoleErrorOriginal;
@@ -139,7 +149,9 @@ export async function executar({ limpar = true } = {}) {
   if ( limpar ) {
     for ( const app of [...foundry.applications.instances.values()] ) {
       if ( app instanceof EscolherAtor ) { await app.close(); continue; }
-      if ( (app instanceof FichaInfectado) || (app instanceof FichaAmeaca) || (app instanceof FichaItem) || (app instanceof MontarTeste) ) {
+      if ( (app instanceof PartituraConflito) && criados.atores.includes(app.conflito) ) { await app.close(); continue; }
+      if ( (app instanceof FichaInfectado) || (app instanceof FichaAmeaca) || (app instanceof FichaConflito)
+        || (app instanceof FichaItem) || (app instanceof MontarTeste) ) {
         if ( criados.atores.some(a => app.document?.parent === a || app.document === a || app.actor === a) ) await app.close();
       }
     }
@@ -165,8 +177,12 @@ async function testarRegistro(s) {
   s.ok(CONFIG.Dice.terms.q === DadoInstinto && CONFIG.Dice.terms.l === DadoLosango && CONFIG.Dice.terms.p === DadoAssimilado,
     "Termos dq, dl e dp registrados");
   s.ok(CONFIG.Dice.rolls.includes(RolagemAssimilacao), "RolagemAssimilacao registrada em CONFIG.Dice.rolls");
-  s.ok(["infectado", "personagem", "ameaca"].every(t => CONFIG.Actor.dataModels[t]), "Modelos de Ator: infectado, personagem, ameaca");
-  s.ok(["caracteristica", "equipamento", "mutacao", "ativacao"].every(t => CONFIG.Item.dataModels[t]), "Modelos de Item (com Ativação)");
+  s.ok(["infectado", "personagem", "ameaca", "conflito"].every(t => CONFIG.Actor.dataModels[t]), "Modelos de Ator: infectado, personagem, ameaca, conflito");
+  s.ok(["caracteristica", "equipamento", "mutacao", "ativacao", "objetivo", "condicionante"].every(t => CONFIG.Item.dataModels[t]),
+    "Modelos de Item (com Ativação, Objetivo e Condicionante)");
+  s.ok(game.settings.settings.has("assimilacao.dificuldade") && game.settings.settings.has("assimilacao.conflitoAtivo"),
+    "Configurações de dificuldade e Conflito ativo");
+  s.ok(!!Handlebars.partials.ativacao && !!Handlebars.partials.objetivoMontagem, "Parciais da partitura carregadas");
   s.igual(CONFIG.Actor.trackableAttributes?.ameaca?.bar, ["neutralizacao"], "Barra rastreável da Ameaça: Neutralização");
   s.ok(["personagem", "ameaca"].every(t => game.i18n.has(`TYPES.Actor.${t}`)) && game.i18n.has("TYPES.Item.ativacao"),
     "Nomes dos novos tipos traduzidos");
@@ -1198,7 +1214,7 @@ async function testarApi(s, ator, pda, am, criados) {
   s.ok(!!pack, "Compêndio \"Macros do Assimilação\" carregado");
   if ( pack ) {
     const docs = await pack.getDocuments();
-    s.igual(docs.length, 6, "Seis macros no compêndio");
+    s.igual(docs.length, 7, "Sete macros no compêndio");
     const chamadas = docs.flatMap(m => [...m.command.matchAll(/game\.assimilacao\.(\w+)/g)].map(r => r[1]));
     s.ok((chamadas.length === docs.length) && chamadas.every(f => typeof api[f] === "function"),
       "Cada macro chama uma função existente da API", chamadas.join(", "));
@@ -1304,6 +1320,254 @@ async function testarApi(s, ator, pda, am, criados) {
     await comFaces([1, 1, 1], () => api.rolarPoolAmeaca({ ator: am }));
     s.ok(await ate(() => game.messages.size === n + 1), "rolarPoolAmeaca rola o pool");
   }
+}
+
+/* -------------------------------------------- */
+/*  14. Conflito e Partitura                    */
+/* -------------------------------------------- */
+
+function acharPartitura(conflito) {
+  const app = foundry.applications.instances.get(`asm-partitura-${conflito.id}`);
+  return app?.rendered ? app : null;
+}
+
+async function testarConflito(s, ator, pda, am, criados) {
+  s.grupo("Conflito");
+  if ( !pda || !am ) return s.ok(false, "Conflito precisa do PdA e da Ameaça dos testes anteriores");
+  let c;
+  await s.tentar("Criar Conflito", async () => {
+    c = await Actor.create({ name: `${PREFIXO} Bloqueio na Estrada`, type: "conflito" });
+    criados.atores.push(c);
+  });
+  if ( !c ) return;
+  const sys = () => c.system;
+  s.ok(await ate(() => c.items.some(i => i.type === "objetivo")), "Conflito novo já vem com um Objetivo");
+  const fuga = c.items.find(i => i.type === "objetivo");
+  s.igual([fuga?.name, fuga?.system.fuga, fuga?.system.acumulo, fuga?.system.repeticao, fuga?.system.categoria],
+    ["Fuga", true, "individual", "porInfectado", "principal"], "Fuga pré-criada: Principal, individual, uma por Infectado");
+  s.igual([c.img, sys().valorPool, sys().recomendado, sys().balanco], ["icons/svg/combat.svg", 4, 4, "ok"],
+    "Conflito: pool padrão 2■ + 1◆ vale 4, recomendado 4 para iniciantes com 1 Infectado");
+  s.ok(c.sheet instanceof FichaConflito, "Ficha padrão do Conflito");
+
+  // Montagem
+  const [romper, sec, condic, ativC, ativA] = await c.createEmbeddedDocuments("Item", [
+    { type: "objetivo", name: `${PREFIXO} Romper`, system: { categoria: "principal", custo: { base: 7, porInfectadoExtra: 1 } } },
+    { type: "objetivo", name: `${PREFIXO} Render o líder`, system: { categoria: "secundario", ameaca: am.id } },
+    { type: "condicionante", name: `${PREFIXO} Chuva forte`, system: { termino: "até a chuva passar" } },
+    { type: "ativacao", name: `${PREFIXO} Tiro de pistola`, system: { custo: { C: 3 }, dano: "3◆", alvos: "um alvo" } },
+    { type: "ativacao", name: `${PREFIXO} Hesitação`, system: { custo: { A: 2 } } }
+  ]).then(() => [
+    c.items.find(i => i.name.endsWith("Romper")), c.items.find(i => i.name.endsWith("Render o líder")),
+    c.items.find(i => i.name.endsWith("Chuva forte")), c.items.find(i => i.name.endsWith("Tiro de pistola")),
+    c.items.find(i => i.name.endsWith("Hesitação"))
+  ]);
+  s.ok(romper && sec && condic && ativC && ativA, "Objetivos, Condicionante e Ativações criados");
+  s.igual([romper.img, condic.img], ["icons/svg/target.svg", "icons/svg/clockwork.svg"], "Ícones de Objetivo e Condicionante");
+  s.igual(romper.system.meta, 7, "Romper: 7A com 1 Infectado");
+  s.igual(motor.custoObjetivoTexto(romper), "AAAAAAA · +A por Infectado além do primeiro", "Texto do custo do Objetivo");
+  await motor.vincularAmeaca(c, am.id);
+  let am2;
+  await s.tentar("Arrastar Ameaça para a ficha do Conflito", async () => {
+    am2 = await Actor.create({ name: `${PREFIXO} Sabotadores`, type: "ameaca", system: { pool: { q: 1, l: 0, p: 0 } } });
+    criados.atores.push(am2);
+    await am2.createEmbeddedDocuments("Item", [{ type: "ativacao", name: `${PREFIXO} Sabotagem`, system: { custo: { C: 2 } } }]);
+    await c.sheet._onDropActor(new DragEvent("drop"), am2);
+    s.igual(sys().ameacas, [am.id, am2.id], "Ameaça arrastada fica vinculada, na ordem");
+  });
+
+  // Ficha do Conflito
+  const ficha = c.sheet;
+  await ficha.render({ force: true });
+  s.ok(await ate(() => ficha.rendered && ficha.element.querySelectorAll(".asm-pt-objetivo").length === 3), "Ficha do Conflito mostra os três Objetivos");
+  const q = sel => ficha.element?.querySelector(sel);
+  s.igual(ficha.element.querySelectorAll(".asm-pt-ameaca-vinculo").length, 2, "Ficha lista as duas Ameaças");
+  s.ok(!!q(".asm-pt-condicionante") && !!q('[data-action="iniciarConflito"]'), "Condicionante e botão Iniciar na ficha");
+  s.ok(![...ficha.element.querySelectorAll(".asm-pt-avisos li")].some(li => /Fuga|Principal/.test(li.textContent)),
+    "Com Fuga e Objetivo Principal, sem avisos de montagem desses");
+  s.igual(chavesCruas(ficha.element.innerHTML), [], "Ficha do Conflito sem chaves de idioma faltando");
+  await clicarEsperar(ficha, `[data-item-id="${condic.id}"] [data-action="alternarCondicionante"]`);
+  s.ok(await ate(() => !condic.system.ativa), "Condicionante liga e desliga");
+  await condic.update({ "system.ativa": true });
+  ficha.setPosition({ width: 560 });
+  await espera(250);
+  const secF = q('section.tab[data-tab="partitura"]');
+  s.ok(secF && (secF.scrollWidth <= secF.clientWidth + 2), "Ficha do Conflito a 560 px sem rolagem horizontal", `${secF?.scrollWidth} > ${secF?.clientWidth}`);
+  await ficha.close();
+
+  // Início da cena
+  await ator.update({ "system.instintos.potencia": 2, "system.saude.dano": 0, "system.determinacao.value": 9,
+    "system.assimilacao.value": 1, "system.mutacaoPendente": false });
+  let n = game.messages.size;
+  await motor.iniciar(c, { presentes: [ator.id, pda.id], iniciante: "infectados", motivo: "Os saqueadores fecharam a estrada" });
+  s.igual([sys().cena.ativa, sys().cena.rodada, sys().cena.fase, game.settings.get("assimilacao", "conflitoAtivo")],
+    [true, 1, "infectados", c.id], "Conflito iniciado: rodada 1, turno dos Infectados, marcado como ativo");
+  s.ok(game.messages.size > n, "Início anunciado no chat");
+  s.igual([romper.system.meta, am.system.infectadosPresentes, am2.system.infectadosPresentes], [8, 2, 2],
+    "Com 2 presentes: Romper custa 8A e as Ameaças contam 2 Infectados");
+  s.ok(motor.estaNoConflito(ator) && !motor.estaNoConflito(am), "Quem está na cena testa em Conflito");
+  s.ok(await ate(() => acharPartitura(c)), "A Partitura abre sozinha ao iniciar");
+  const app = acharPartitura(c);
+  if ( app ) {
+    const qa = sel => [...app.element.querySelectorAll(sel)];
+    s.ok(qa(".asm-pc-fases li.atual")[0]?.textContent.includes("Infectados"), "Partitura mostra a fase atual");
+    s.igual([qa(".asm-pc-presentes li[data-ator]").length, qa(".asm-pc-ameaca").length, qa(".asm-pt-objetivo").length],
+      [2, 2, 3], "Partitura: 2 presentes, 2 Ameaças, 3 Objetivos");
+    s.igual(qa('[data-item-id="' + fuga.id + '"] .asm-obj-linhas li[data-ator]').length, 2, "Fuga individual: uma barra por presente");
+    s.igual(chavesCruas(app.element.innerHTML), [], "Partitura sem chaves de idioma faltando");
+    await clicarEsperar(app, `[data-item-id="${romper.id}"] [data-action="casaObjetivo"][data-i="3"]`);
+    s.ok(await ate(() => romper.system.progresso.total === 3), "GM marca progresso direto nas casas do Objetivo");
+    await romper.update({ "system.progresso.total": 0 });
+  }
+
+  // Teste em Conflito: investir os A pelo card
+  const estado = { modo: "aptidao", instinto: "potencia", aptidao: "", origemEvento: false, origemOcupacao: false,
+    empenho: false, emConflito: true, extraQ: 0, extraL: 1, extraP: 0, manterExtra: 0, intencao: "" };
+  const montar = new MontarTeste(ator, {});
+  s.ok(montar.estado.emConflito, "Montar Teste já marca \"Em Conflito\" para quem está na cena");
+  await comFaces([3, 3, 7], () => executarTeste(ator, estado, montar.calcular(estado)));
+  let msg = game.messages.contents.at(-1);
+  (await msg.renderHTML()).querySelector('[data-acao="sugerir"]')?.click();
+  await ate(() => msg.rolls[0].options.mantidos.length === 1);
+  (await msg.renderHTML()).querySelector('[data-acao="confirmar"]')?.click();
+  await ate(() => msg.rolls[0].options.travado);
+  s.igual(msg.rolls[0].resultado.A, 2, "Teste em Conflito: AA mantidos");
+  let html = await msg.renderHTML();
+  const destinos = [...html.querySelectorAll('[data-acao="investir"]')].map(b => b.dataset.destino);
+  s.ok(destinos.includes(`obj:${romper.id}`) && destinos.includes(`obj:${sec.id}`) && destinos.includes(`obj:${fuga.id}`)
+    && destinos.includes(`neu:${am2.id}`) && !destinos.includes(`neu:${am.id}`),
+    "Card oferece os Objetivos e a Neutralização da Ameaça sem Objetivo", destinos.join(", "));
+  s.igual(chavesCruas(html.innerHTML), [], "Card de Conflito sem chaves de idioma faltando");
+  html.querySelector(`[data-acao="investir"][data-destino="obj:${romper.id}"]`)?.click();
+  s.ok(await ate(() => romper.system.progresso.total === 1), "Clique investe 1 A no Objetivo");
+  html = await msg.renderHTML();
+  html.querySelector(`[data-acao="investir"][data-destino="obj:${romper.id}"]`)
+    ?.dispatchEvent(new MouseEvent("click", { bubbles: true, shiftKey: true }));
+  s.ok(await ate(() => romper.system.progresso.total === 2), "Shift investe todos os A restantes");
+  s.igual([romper.system.contribuicoes[ator.id], msg.rolls[0].options.investimentos?.[0]?.A], [2, 2],
+    "Contribuição registrada no Objetivo e no card");
+  html = await msg.renderHTML();
+  s.ok(!html.querySelector('[data-acao="investir"]') && !!html.querySelector(".asm-investimentos"),
+    "Sem A restantes: o card mostra onde os A foram investidos");
+
+  // Segundo teste: A na Fuga e C para a partitura
+  await comFaces([3, 3, 9], () => executarTeste(ator, estado, montar.calcular(estado)));
+  msg = game.messages.contents.at(-1);
+  (await msg.renderHTML()).querySelector('[data-acao="sugerir"]')?.click();
+  await ate(() => msg.rolls[0].options.mantidos.length === 1);
+  (await msg.renderHTML()).querySelector('[data-acao="confirmar"]')?.click();
+  await ate(() => msg.rolls[0].options.travado);
+  html = await msg.renderHTML();
+  html.querySelector(`[data-acao="investir"][data-destino="obj:${fuga.id}"]`)?.click();
+  s.ok(await ate(() => fuga.system.contribuicoes[ator.id] === 1), "A investido na Fuga individual");
+  html = await msg.renderHTML();
+  html.querySelector('[data-acao="gm-c-partitura"]')?.click();
+  s.ok(await ate(() => sys().saldo.C === 1 && msg.rolls[0].options.cLevadas === 1), "GM leva a C do teste para o saldo do Conflito");
+
+  // Fuga completa: o Infectado sai da cena e os custos caem
+  await motor.investirObjetivo(c, fuga, ator.id, 1);
+  s.ok(await ate(() => sys().cena.fugiram.includes(ator.id)), "Fuga completa: o Infectado sai da cena");
+  s.igual([sys().presentesEfetivos, romper.system.meta, am.system.infectadosPresentes], [1, 7, 1],
+    "Sem quem fugiu: Romper volta a 7A e as Ameaças contam 1 Infectado");
+  await motor.alternarFuga(c, ator.id);
+  s.ok(!sys().cena.fugiram.includes(ator.id) && am.system.infectadosPresentes === 2, "GM pode trazer de volta à cena");
+
+  // Objetivo ligado à Ameaça e Neutralização direta
+  await motor.investirObjetivo(c, sec, ator.id, 2);
+  s.igual(am.system.neutralizacao.value, 2, "Objetivo vinculado investe na Neutralização da Ameaça");
+  const usados = await motor.investirNeutralizacao(c, am2, ator.id, 99);
+  s.igual([usados, am2.system.neutralizada], [am2.system.neutralizacao.max, true], "Neutralizar não passa do custo e marca a Ameaça");
+
+  // Turno do Assimilador: pool, saldo, casas e trava de fase
+  s.ok(await motor.proximaFase(c) && sys().cena.fase === "assimilador", "Próxima fase: turno do(a) Assimilador(a)");
+  n = game.messages.size;
+  await comFaces([3, 6, 9], () => c.rolarPool());
+  s.igual(sys().saldo, { A: 2, B: 1, C: 3 }, "Pool rolado vai para o saldo (C, A, ABC + 1 C levada)");
+  const rPool = game.messages.contents.at(-1).rolls[0];
+  s.ok(rPool?.options.saldoAplicado && rPool.options.dono === c.uuid, "Card do pool marca o saldo aplicado");
+  s.ok(!(await motor.proximaFase(c)), "Com A ou C no saldo, a fase não avança");
+  await motor.investirCasa(c, ativC, "C", 3);
+  s.igual([ativC.system.progresso.C, sys().saldo.C], [3, 0], "Marcar a 3ª casa usa 3 C do saldo");
+  await motor.investirCasa(c, ativC, "C", 3);
+  s.igual([ativC.system.progresso.C, sys().saldo.C], [2, 1], "Desmarcar devolve a C ao saldo");
+  await motor.investirCasa(c, ativC, "C", 3);
+  await motor.investirCasa(c, ativA, "A", 2);
+  s.igual(sys().saldo, { A: 0, B: 1, C: 0 }, "Saldo zerado nos A e C (B é opcional)");
+  s.ok(!(await motor.proximaFase(c)), "Ativações completas precisam disparar antes de avançar");
+  n = game.messages.size;
+  await comFaces([9, 9, 9], () => c.dispararAtivacao(ativC));
+  await c.dispararAtivacao(ativA);
+  s.ok(await ate(() => game.messages.size >= n + 3), "Ativações disparadas: anúncio e dano no chat");
+  s.ok(sys().cena.log.some(l => l.texto.includes("Tiro de pistola")), "Disparo fica no registro da cena");
+  s.ok(await motor.proximaFase(c) && sys().cena.fase === "fim" && sys().saldo.B === 0, "Fim da rodada: B não usados se perdem");
+  s.ok(await motor.proximaFase(c) && sys().cena.rodada === 2 && sys().cena.fase === "infectados", "Rodada 2 começa pelos Infectados");
+
+  // C do Conflito retira progresso de um Objetivo (p. 198)
+  await c.update({ "system.saldo.C": 1 });
+  await motor.retirarProgresso(c, romper);
+  s.igual([romper.system.progresso.total, sys().saldo.C], [1, 0], "1 C retira 1 A de progresso");
+  s.ok(!(await motor.retirarProgresso(c, romper)), "Sem C no saldo, não retira");
+
+  // Dificuldade elevada: ⬟ extra e escolha dos mantidos
+  await c.update({ "system.dificuldade": "sofrimento" });
+  const r = await comFaces([1, 1, 1, 12], () => c.rolarPool());
+  s.ok(r && !r.mantemTodos && r.limitesManter.max === 3, "Sofrimento: +1⬟ rolado, mantém só 3");
+  s.igual(sys().saldo, { A: 0, B: 0, C: 0 }, "Saldo só entra depois de escolher os dados");
+  msg = game.messages.contents.at(-1);
+  (await msg.renderHTML()).querySelector('[data-acao="sugerir"]')?.click();
+  await ate(() => msg.rolls[0].options.mantidos.length === 3);
+  s.ok(msg.rolls[0].options.mantidos.includes(3), "Sugestão do GM mantém o ⬟ com CC");
+  (await msg.renderHTML()).querySelector('[data-acao="confirmar"]')?.click();
+  s.ok(await ate(() => sys().saldo.C === 2), "Ao confirmar, os símbolos mantidos vão para o saldo");
+  await c.update({ "system.dificuldade": "", "system.saldo": { A: 0, B: 0, C: 0 } });
+
+  // Dano sem alvos: avisa e não aplica (só roda se o GM não tiver alvos marcados no mapa)
+  if ( !game.user.targets.size ) {
+    await comFaces([9], () => game.assimilacao.rolar("1dl", { tipo: "dano" }));
+    msg = game.messages.contents.at(-1);
+    s.ok(!!(await msg.renderHTML()).querySelector('[data-acao="gm-aplicar-dano"]'), "Card de dano tem o botão de aplicar aos alvos");
+    (await msg.renderHTML()).querySelector('[data-acao="gm-aplicar-dano"]')?.click();
+    await espera(200);
+    s.igual(msg.rolls[0].options.aplicadoEm ?? [], [], "Aplicar dano sem alvos marcados não faz nada");
+  }
+
+  // Partitura estreita
+  if ( acharPartitura(c) ) {
+    const pa = acharPartitura(c);
+    pa.setPosition({ width: 640 });
+    await espera(300);
+    const corpo = pa.element.querySelector(".asm-pc-corpo");
+    s.ok(corpo && (corpo.scrollWidth <= corpo.clientWidth + 2), "Partitura a 640 px sem rolagem horizontal", `${corpo?.scrollWidth} > ${corpo?.clientWidth}`);
+    const principal = pa.element.querySelector(".asm-pc-principal").getBoundingClientRect();
+    const lateral = pa.element.querySelector(".asm-pc-lateral").getBoundingClientRect();
+    s.ok(lateral.top >= principal.bottom - 1, "Partitura estreita: painel da cena abaixo da partitura, sem sobrepor",
+      `lateral.top ${Math.round(lateral.top)} < principal.bottom ${Math.round(principal.bottom)}`);
+    pa.setPosition({ width: 480 });
+    await espera(250);
+    const p2 = pa.element.querySelector(".asm-pc-principal").getBoundingClientRect();
+    const l2 = pa.element.querySelector(".asm-pc-lateral").getBoundingClientRect();
+    s.ok(l2.top >= p2.bottom - 1, "Partitura a 480 px também sem sobrepor");
+    pa.setPosition({ width: 1040 });
+  }
+
+  // Encerrar
+  n = game.messages.size;
+  await ator.update({ "system.assimilacao.value": 0 });
+  await motor.encerrar(c, { fimDeCena: true, zerar: true });
+  s.ok(!sys().cena.ativa && (game.settings.get("assimilacao", "conflitoAtivo") === ""), "Conflito encerrado e desmarcado");
+  s.ok(game.messages.contents.at(-1)?.content.includes("conflito-card fim"), "Resumo do Conflito no chat");
+  s.igual(ator.system.assimilacao.value, ator.system.assimilacao.max, "Fim de cena para os presentes");
+  s.ok(await ate(() => !acharPartitura(c)), "Partitura fecha ao encerrar");
+  s.igual([romper.system.progresso.total, Object.keys(romper.system.progresso.porInfectado).length, ativC.system.disparos,
+    am.system.neutralizacao.value], [0, 0, 0, 0], "Partitura zerada para reaproveitar");
+
+  // Ameaça que vira o próprio Conflito
+  await s.tentar("Ameaça vira Conflito", async () => {
+    const c2 = await am2.criarConflito();
+    criados.atores.push(c2);
+    s.ok(await ate(() => c2.items.filter(i => i.type === "objetivo").length === 2), "Conflito criado com Neutralizar e Fuga");
+    s.igual([c2.items.filter(i => i.type === "ativacao").length, c2.system.pool.q, am2.system.ehOProprioConflito],
+      [1, 1, true], "Ativações e pool copiados; Ameaça marcada como o próprio Conflito");
+  });
 }
 
 /* -------------------------------------------- */

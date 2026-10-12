@@ -60,6 +60,31 @@
       {{formGroup systemFields.requerMunicao value=source.system.requerMunicao}}
       {{formGroup systemFields.disparos value=source.system.disparos}}
     {{/if}}
+    {{#if ehObjetivo}}
+      {{formGroup systemFields.categoria value=source.system.categoria localize=true}}
+      {{formGroup systemFields.fuga value=source.system.fuga}}
+      <fieldset class="asm-usos-campos">
+        <legend>{{localize "ASSIMILACAO.Objetivo.FIELDS.custo.label"}}</legend>
+        {{formGroup systemFields.custo.fields.base value=source.system.custo.base}}
+        {{formGroup systemFields.custo.fields.porInfectadoExtra value=source.system.custo.porInfectadoExtra}}
+        {{formGroup systemFields.custo.fields.porInfectado value=source.system.custo.porInfectado}}
+        {{formGroup systemFields.custo.fields.minimoPorInfectado value=source.system.custo.minimoPorInfectado}}
+        <p class="hint">{{custoResumo}}</p>
+      </fieldset>
+      {{formGroup systemFields.acumulo value=source.system.acumulo localize=true}}
+      {{formGroup systemFields.repeticao value=source.system.repeticao localize=true}}
+      <div class="form-group">
+        <label>{{localize "ASSIMILACAO.Objetivo.FIELDS.ameaca.label"}}</label>
+        <div class="form-fields"><select name="system.ameaca">{{selectOptions ameacasOpcoes selected=source.system.ameaca blank=nenhumaAmeaca}}</select></div>
+        <p class="hint">{{localize "ASSIMILACAO.Objetivo.FIELDS.ameaca.hint"}}</p>
+      </div>
+      {{formGroup systemFields.restricao value=source.system.restricao}}
+      {{formGroup systemFields.recompensa value=source.system.recompensa}}
+    {{/if}}
+    {{#if ehCondicionante}}
+      {{formGroup systemFields.ativa value=source.system.ativa}}
+      {{formGroup systemFields.termino value=source.system.termino}}
+    {{/if}}
     {{#if systemFields.usos}}
     <fieldset class="asm-usos-campos">
       <legend>{{localize "ASSIMILACAO.Item.usos"}}</legend>
@@ -71,7 +96,7 @@
   </div>
 
   <div class="asm-bloco-rasgado">
-    <h2 class="asm-faixa-pincel kraft">{{#if ehAtivacao}}{{localize "ASSIMILACAO.Ativacao.efeito"}}{{else}}{{localize "ASSIMILACAO.Item.descricao"}}{{/if}}</h2>
+    <h2 class="asm-faixa-pincel kraft">{{#if (or ehAtivacao ehCondicionante)}}{{localize "ASSIMILACAO.Ativacao.efeito"}}{{else}}{{localize "ASSIMILACAO.Item.descricao"}}{{/if}}</h2>
     <prose-mirror name="system.descricao" value="{{source.system.descricao}}" toggled
                   data-document-uuid="{{item.uuid}}">{{{descricaoHTML}}}</prose-mirror>
   </div>

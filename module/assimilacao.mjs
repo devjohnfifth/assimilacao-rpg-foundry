@@ -10,12 +10,16 @@ import { registrarDiceSoNice } from "./dice/dsn.mjs";
 import { InfectadoData } from "./data/infectado.mjs";
 import { PersonagemData } from "./data/personagem.mjs";
 import { AmeacaData } from "./data/ameaca.mjs";
-import { CaracteristicaData, EquipamentoData, MutacaoData, AtivacaoData } from "./data/itens.mjs";
+import { ConflitoData } from "./data/conflito.mjs";
+import { CaracteristicaData, EquipamentoData, MutacaoData, AtivacaoData, ObjetivoData, CondicionanteData } from "./data/itens.mjs";
 import { AtorAssimilacao } from "./documents/actor.mjs";
 import { ItemAssimilacao } from "./documents/item.mjs";
 import { FichaInfectado } from "./sheets/infectado-sheet.mjs";
 import { FichaItem } from "./sheets/item-sheet.mjs";
 import { FichaAmeaca } from "./sheets/ameaca-sheet.mjs";
+import { FichaConflito } from "./sheets/conflito-sheet.mjs";
+import { PartituraConflito, dialogoIniciar, dialogoEncerrar } from "./apps/partitura-conflito.mjs";
+import * as motor from "./conflito/motor.mjs";
 import { MontarTeste, executarTeste } from "./apps/montar-teste.mjs";
 import { EscolherAtor } from "./apps/escolher-ator.mjs";
 import { registrarEnricher } from "./helpers/enricher.mjs";
@@ -38,18 +42,22 @@ Hooks.once("init", () => {
   Object.assign(CONFIG.Actor.dataModels, {
     infectado: InfectadoData,
     personagem: PersonagemData,
-    ameaca: AmeacaData
+    ameaca: AmeacaData,
+    conflito: ConflitoData
   });
   Object.assign(CONFIG.Item.dataModels, {
     caracteristica: CaracteristicaData,
     equipamento: EquipamentoData,
     mutacao: MutacaoData,
-    ativacao: AtivacaoData
+    ativacao: AtivacaoData,
+    objetivo: ObjetivoData,
+    condicionante: CondicionanteData
   });
   CONFIG.Actor.trackableAttributes = {
     infectado: { bar: ["saude", "determinacao", "assimilacao"], value: [] },
     personagem: { bar: ["saude", "determinacao", "assimilacao"], value: [] },
-    ameaca: { bar: ["neutralizacao"], value: [] }
+    ameaca: { bar: ["neutralizacao"], value: [] },
+    conflito: { bar: [], value: [] }
   };
 
   // Fichas
@@ -60,8 +68,12 @@ Hooks.once("init", () => {
   DocumentSheetConfig.registerSheet(Actor, "assimilacao", FichaAmeaca, {
     types: ["ameaca"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloAmeaca"
   });
+  DocumentSheetConfig.registerSheet(Actor, "assimilacao", FichaConflito, {
+    types: ["conflito"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloConflito"
+  });
   DocumentSheetConfig.registerSheet(Item, "assimilacao", FichaItem, {
-    types: ["caracteristica", "equipamento", "mutacao", "ativacao"], makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloItem"
+    types: ["caracteristica", "equipamento", "mutacao", "ativacao", "objetivo", "condicionante"],
+    makeDefault: true, label: "ASSIMILACAO.Ficha.rotuloItem"
   });
 
   // Configurações
@@ -70,6 +82,23 @@ Hooks.once("init", () => {
     hint: "ASSIMILACAO.Config.tetoMantidosDica",
     scope: "world", config: true, type: Number, default: 4,
     range: { min: 1, max: 10, step: 1 }
+  });
+  game.settings.register("assimilacao", "dificuldade", {
+    name: "ASSIMILACAO.Config.dificuldade",
+    hint: "ASSIMILACAO.Config.dificuldadeDica",
+    scope: "world", config: true, type: String, default: "exploracao",
+    choices: Object.fromEntries(Object.entries(ASSIMILACAO.DIFICULDADES).map(([k, v]) => [k, v.rotulo]))
+  });
+  game.settings.register("assimilacao", "conflitoAtivo", {
+    scope: "world", config: false, type: String, default: "",
+    onChange: id => {
+      if ( !game.ready ) return;
+      const conflito = id ? game.actors.get(id) : null;
+      if ( conflito ) PartituraConflito.abrir(conflito);
+      else for ( const app of [...foundry.applications.instances.values()] ) {
+        if ( app instanceof PartituraConflito ) app.close();
+      }
+    }
   });
   game.settings.register("assimilacao", "ornamentos", {
     name: "ASSIMILACAO.Config.ornamentos",
@@ -99,7 +128,9 @@ Hooks.once("init", () => {
   // Templates e parciais
   foundry.applications.handlebars.loadTemplates({
     aptidao: `${SIS}/templates/actor/partes/aptidao.hbs`,
-    faixaSaude: `${SIS}/templates/actor/partes/faixa-saude.hbs`
+    faixaSaude: `${SIS}/templates/actor/partes/faixa-saude.hbs`,
+    ativacao: `${SIS}/templates/actor/partes/ativacao.hbs`,
+    objetivoMontagem: `${SIS}/templates/actor/partes/objetivo-montagem.hbs`
   });
 
   registrarEnricher();
@@ -108,8 +139,9 @@ Hooks.once("init", () => {
 
   // API pública para macros (ver o compêndio "Macros do Assimilação")
   game.assimilacao = {
-    RolagemAssimilacao, MontarTeste, EscolherAtor, executarTeste,
+    RolagemAssimilacao, MontarTeste, EscolherAtor, executarTeste, PartituraConflito,
     dados: { DadoInstinto, DadoLosango, DadoAssimilado },
+    conflito: { ...motor, dialogoIniciar, dialogoEncerrar },
     ...api,
     /** Roda a suíte de testes automáticos (GM). Ex.: game.assimilacao.testar() */
     async testar(opcoes = {}) {
@@ -122,4 +154,8 @@ Hooks.once("init", () => {
 Hooks.once("ready", () => {
   if ( !game.settings.get("assimilacao", "ornamentos") ) document.body.classList.add("asm-sem-ornamentos");
   document.body.classList.add("sistema-assimilacao");
+  motor.registrarSocket();
+  // Conflito em andamento: a partitura abre para todos ao entrar no mundo
+  const ativo = motor.conflitoAtivo();
+  if ( ativo ) PartituraConflito.abrir(ativo);
 });

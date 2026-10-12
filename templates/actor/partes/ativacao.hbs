@@ -1,0 +1,27 @@
+<article class="asm-pt-ativacao {{#if completa}}completa{{/if}} {{#if esgotada}}esgotada{{/if}}" data-item-id="{{id}}" data-dono="{{dono}}">
+  <div class="asm-pt-ativ-cab">
+    <span class="asm-casas">
+      {{#each casas}}
+      <span class="asm-casa casa-{{s}} {{#if cheia}}cheia{{/if}}" {{#if ../editavel}}data-action="casaAtivacao"{{/if}}
+            data-s="{{s}}" data-i="{{i}}" role="button" aria-pressed="{{cheia}}"
+            data-tooltip="{{localize (concat "ASSIMILACAO.Simbolo." s)}} {{i}}"><img src="{{icone}}" alt="{{s}}"></span>
+      {{/each}}
+      {{#if semCusto}}<span class="asm-nota">{{localize "ASSIMILACAO.Ativacao.semCusto"}}</span>{{/if}}
+    </span>
+    <span class="asm-pt-ativ-nome" {{#if editavel}}data-action="editarItem"{{/if}}>{{name}}</span>
+    {{#if system.unicaVez}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.unicaVez.label"}}</span>{{/if}}
+    {{#if system.pagamentoIntegral}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.pagamentoIntegral.label"}}</span>{{/if}}
+    {{#if system.requerMunicao}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.requerMunicao.label"}}</span>{{/if}}
+    {{#if system.disparos}}<span class="asm-tag disparos" data-tooltip="{{localize "ASSIMILACAO.Ativacao.disparosDica"}}">×{{system.disparos}}</span>{{/if}}
+    {{#if editavel}}
+    <span class="asm-item-controles">
+      <a data-action="dispararAtivacao" class="disparar {{#if completa}}pronta{{/if}}" data-tooltip="{{localize "ASSIMILACAO.Ativacao.dispararDica"}}" aria-label="{{localize "ASSIMILACAO.Ativacao.dispararDica"}}"><i class="fa-solid fa-bolt"></i></a>
+      <a data-action="limparAtivacao" data-tooltip="{{localize "ASSIMILACAO.Ativacao.limpar"}}" aria-label="{{localize "ASSIMILACAO.Ativacao.limpar"}}"><i class="fa-solid fa-eraser"></i></a>
+      <a data-action="editarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.editar"}}" aria-label="{{localize "ASSIMILACAO.Ficha.editar"}}"><i class="fa-solid fa-pen"></i></a>
+      {{#if apagavel}}<a data-action="apagarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.remover"}}" aria-label="{{localize "ASSIMILACAO.Ficha.remover"}}"><i class="fa-solid fa-trash"></i></a>{{/if}}
+    </span>
+    {{/if}}
+  </div>
+  {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
+  {{#if system.dano}}<div class="asm-pt-ativ-dano"><i class="fa-solid fa-droplet"></i> {{localize "ASSIMILACAO.Ativacao.FIELDS.dano.label"}}: <strong>{{system.dano}}</strong>{{#if system.alvos}} · {{system.alvos}}{{/if}}</div>{{/if}}
+</article>

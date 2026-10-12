@@ -91,3 +91,65 @@ export class AtivacaoData extends foundry.abstract.TypeDataModel {
     this.custoTexto = "A".repeat(c.A) + "B".repeat(c.B) + "C".repeat(c.C);
   }
 }
+
+/**
+ * Objetivo de um Conflito (p. 68, 199–205; seção 10.2).
+ * O custo em A cresce com os Infectados presentes; o progresso pode ser coletivo (uma barra para todos)
+ * ou individual (cada Infectado acumula o seu, como na Fuga).
+ */
+export class ObjetivoData extends foundry.abstract.TypeDataModel {
+  static LOCALIZATION_PREFIXES = ["ASSIMILACAO.Objetivo"];
+  static defineSchema() {
+    return {
+      categoria: new f.StringField({ required: true, initial: "principal", choices: () => CONFIG.ASSIMILACAO.CATEGORIAS_OBJETIVO }),
+      fuga: new f.BooleanField({ initial: false }),
+      custo: new f.SchemaField({
+        base: inteiro(3, 0, 99),
+        porInfectadoExtra: inteiro(0, 0, 30),
+        porInfectado: inteiro(0, 0, 30),
+        minimoPorInfectado: inteiro(0, 0, 30)
+      }),
+      acumulo: new f.StringField({ required: true, initial: "coletivo", choices: () => CONFIG.ASSIMILACAO.ACUMULOS }),
+      repeticao: new f.StringField({ required: true, initial: "unica", choices: () => CONFIG.ASSIMILACAO.REPETICOES }),
+      progresso: new f.SchemaField({
+        total: inteiro(0, 0, 999),
+        porInfectado: new f.ObjectField()
+      }),
+      conclusoes: inteiro(0, 0, 99),
+      concluidoPor: new f.ArrayField(new f.StringField({ required: true, blank: false })),
+      ameaca: texto(),
+      restricao: texto(),
+      recompensa: texto(),
+      descricao: new f.HTMLField({ required: true, blank: true, initial: "" })
+    };
+  }
+
+  /** Infectados que contam para o custo (vem do Conflito dono, se houver). */
+  get presentes() {
+    return Math.max(1, this.parent?.actor?.system?.presentesEfetivos ?? 1);
+  }
+
+  /** @override */
+  prepareDerivedData() {
+    const c = this.custo;
+    const n = this.presentes;
+    this.individual = this.acumulo === "individual";
+    this.meta = this.individual ? Math.max(1, c.base)
+      : Math.max(1, c.base + c.porInfectadoExtra * Math.max(0, n - 1) + c.porInfectado * n);
+    this.contribuicoes = Object.fromEntries(Object.entries(this.progresso.porInfectado ?? {})
+      .map(([id, v]) => [id, Math.max(0, Number(v) || 0)]));
+    this.atual = Math.min(this.progresso.total, this.meta);
+  }
+}
+
+/** Condicionante: regra que vale só até o fim do Conflito (p. 200, 244). */
+export class CondicionanteData extends foundry.abstract.TypeDataModel {
+  static LOCALIZATION_PREFIXES = ["ASSIMILACAO.Condicionante"];
+  static defineSchema() {
+    return {
+      ativa: new f.BooleanField({ initial: true }),
+      termino: texto(),
+      descricao: new f.HTMLField({ required: true, blank: true, initial: "" })
+    };
+  }
+}

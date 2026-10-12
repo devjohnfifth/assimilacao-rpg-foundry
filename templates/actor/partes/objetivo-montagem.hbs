@@ -1,0 +1,21 @@
+<article class="asm-pt-objetivo {{#if system.fuga}}fuga{{/if}}" data-item-id="{{id}}">
+  <div class="asm-pt-ativ-cab">
+    <span class="asm-pt-obj-nome" data-action="editarItem">{{name}}</span>
+    <span class="asm-pt-custo-texto">{{custoTexto}}</span>
+    {{#if system.fuga}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.FIELDS.fuga.label"}}</span>{{/if}}
+    {{#if system.individual}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.acumulo.individual"}}</span>{{/if}}
+    {{#if (eq system.repeticao "multipla")}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.repeticao.multipla"}}</span>{{/if}}
+    {{#if (eq system.repeticao "porInfectado")}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.repeticao.porInfectado"}}</span>{{/if}}
+    {{#if ameacaNome}}<span class="asm-tag">{{localize "ASSIMILACAO.Partitura.vinculadaA"}} {{ameacaNome}}</span>{{/if}}
+    <span class="asm-pt-meta" data-tooltip="{{localize "ASSIMILACAO.Objetivo.metaDica"}}">= {{meta}} A</span>
+    {{#if @root.editable}}
+    <span class="asm-item-controles">
+      <a data-action="editarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.editar"}}" aria-label="{{localize "ASSIMILACAO.Ficha.editar"}}"><i class="fa-solid fa-pen"></i></a>
+      <a data-action="apagarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.remover"}}" aria-label="{{localize "ASSIMILACAO.Ficha.remover"}}"><i class="fa-solid fa-trash"></i></a>
+    </span>
+    {{/if}}
+  </div>
+  {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
+  {{#if system.restricao}}<p class="asm-nota"><strong>{{localize "ASSIMILACAO.Objetivo.FIELDS.restricao.label"}}:</strong> {{system.restricao}}</p>{{/if}}
+  {{#if system.recompensa}}<p class="asm-nota"><strong>{{localize "ASSIMILACAO.Objetivo.FIELDS.recompensa.label"}}:</strong> {{system.recompensa}}</p>{{/if}}
+</article>

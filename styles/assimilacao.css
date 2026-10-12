@@ -590,12 +590,12 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 /* ==========================================================================
    Ameaça — partitura (p. 213; seção 26.6)
    ========================================================================== */
-.application.ficha-ameaca .window-content { padding: 0; display: flex; flex-direction: column; overflow: hidden; container-name: ficha; container-type: inline-size; }
-.application.ficha-ameaca nav.sheet-tabs { margin: 8px 14px 0; flex: 0 0 auto; }
-.application.ficha-ameaca section.tab { padding: 8px 14px 14px; overflow-y: auto; }
-.application.ficha-ameaca section.tab:not(.active) { display: none; }
-.application.ficha-ameaca section.tab.active { flex: 1; min-height: 0; }
-.application.ficha-ameaca .asm-notas { display: flex; flex-direction: column; gap: 8px; }
+.application.ficha-partitura .window-content { padding: 0; display: flex; flex-direction: column; overflow: hidden; container-name: ficha; container-type: inline-size; }
+.application.ficha-partitura nav.sheet-tabs { margin: 8px 14px 0; flex: 0 0 auto; }
+.application.ficha-partitura section.tab { padding: 8px 14px 14px; overflow-y: auto; }
+.application.ficha-partitura section.tab:not(.active) { display: none; }
+.application.ficha-partitura section.tab.active { flex: 1; min-height: 0; }
+.application.ficha-partitura .asm-notas { display: flex; flex-direction: column; gap: 8px; }
 .asm-partitura { position: relative; display: flex; flex-direction: column; gap: 8px; }
 
 .asm-pt-titulo {
@@ -748,3 +748,147 @@ body.asm-sem-ornamentos .application.assimilacao .window-content::after { displa
 /* Diálogo "Rolar dados" */
 .asm-rolar-dados .form-group label { display: flex; align-items: center; gap: 6px; font-family: var(--asm-fonte-titulo); font-weight: 600; }
 .asm-rolar-dados .asm-glifo { width: 14px; height: 14px; display: inline-block; background: currentColor; }
+
+/* ==========================================================================
+   Conflito: ficha de montagem, saldo e Objetivos
+   ========================================================================== */
+.asm-pt-andamento {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 6px 10px; background: var(--asm-ardosia); color: #fff; font-family: var(--asm-fonte-titulo); font-weight: 600;
+}
+.application.assimilacao .window-content .asm-pt-andamento button { height: 28px; }
+
+.asm-saldo {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 4px 10px;
+  border: 1.5px dashed var(--asm-vinho); background: rgba(108, 36, 30, .06); font-family: var(--asm-fonte-titulo);
+}
+.asm-pt-conteudo > .asm-saldo { margin: 4px 0; }
+.asm-saldo-rotulo { font-weight: 700; color: var(--asm-vinho-texto); text-transform: uppercase; letter-spacing: .04em; font-size: .85rem; }
+.asm-saldo-item { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; font-size: 1.05rem; }
+.asm-saldo-item img { width: 20px; height: 20px; border: none; }
+
+.asm-pt-objetivo, .asm-pt-condicionante, .asm-pt-ameaca-vinculo { border-bottom: 1px solid var(--asm-linha); padding: 6px 0; }
+.asm-pt-objetivo:last-of-type, .asm-pt-condicionante:last-of-type { border-bottom: none; }
+.asm-pt-obj-nome {
+  font-family: var(--asm-fonte-titulo); font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  color: var(--asm-vinho-texto); font-size: 1.02rem; cursor: pointer;
+}
+.asm-pt-custo-texto { font-family: var(--asm-fonte-etiqueta); font-size: .82rem; color: var(--asm-tinta); }
+.asm-pt-meta { font-family: var(--asm-fonte-titulo); font-weight: 700; margin-left: auto; white-space: nowrap; }
+.asm-pt-objetivo .asm-item-controles, .asm-pt-ameaca-vinculo .asm-item-controles { margin-left: 4px; }
+.asm-pt-objetivo .asm-casas { margin-top: 4px; }
+.asm-pt-objetivo.completo .asm-pt-obj-nome { color: var(--asm-oliva); }
+.asm-selo-concluido {
+  font-family: var(--asm-fonte-carimbo); font-size: .78rem; color: #4d5a2c; border: 2px solid #4d5a2c;
+  padding: 0 6px; transform: rotate(-3deg); text-transform: uppercase;
+}
+.asm-pt-condicionante.inativa { opacity: .5; }
+.asm-pt-condicionante .asm-pt-ativ-nome { cursor: pointer; }
+.asm-pt-ameaca-vinculo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.asm-pt-ameaca-vinculo img { width: 34px; height: 34px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; background: var(--asm-papel-sombra); }
+.asm-pt-ameaca-vinculo .asm-pt-ativ-nome { flex: 1 1 140px; cursor: pointer; }
+.asm-pt-ameaca-vinculo.neutralizada { opacity: .6; }
+.asm-pt-acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.application.assimilacao .window-content .asm-pt-acoes button { height: 32px; }
+.asm-pt-balanco .asm-campo-largo { flex: 1 1 220px; }
+.asm-pt-balanco .asm-campo-largo input { flex: 1; min-width: 120px; }
+
+.asm-contribuicoes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.asm-contrib { display: inline-flex; align-items: center; gap: 3px; font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: .9rem;
+  background: rgba(255, 255, 255, .7); border: 1px solid var(--asm-linha); border-radius: 12px; padding: 0 8px 0 2px; }
+.asm-contrib img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; object-position: top; border: none; }
+.asm-obj-linhas { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.asm-obj-linhas li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.asm-obj-linhas li > img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; object-position: top; border: 1px solid var(--asm-linha); }
+.asm-obj-linha-nome { font-family: var(--asm-fonte-titulo); font-weight: 600; min-width: 90px; }
+.asm-obj-linhas li.completo .asm-obj-linha-nome { color: var(--asm-oliva); }
+.asm-obj-linhas li.fugiu { opacity: .7; }
+.asm-obj-linhas .asm-casa { width: 20px; height: 20px; }
+.asm-obj-linhas .asm-casa img { width: 15px; height: 15px; }
+.asm-mini-controle { font-size: .8rem; opacity: .6; cursor: pointer; }
+.asm-mini-controle:hover { opacity: 1; }
+.asm-nota.aviso { color: var(--asm-vinho); font-family: var(--asm-fonte-titulo); font-weight: 600; }
+
+/* ==========================================================================
+   Janela da Partitura de Conflito
+   ========================================================================== */
+.application.partitura-conflito .window-content { padding: 0; display: flex; flex-direction: column; overflow: hidden; container-name: partitura; container-type: inline-size; }
+.asm-pc { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.asm-pc > .asm-pt-titulo { flex: 0 0 auto; }
+.asm-pc > .asm-pt-subtitulo { margin-top: 0; flex: 0 0 auto; font-family: var(--asm-fonte-mao); font-size: 1.1rem; }
+.asm-pt-nome-texto {
+  flex: 1; min-width: 0; color: #fff; font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1.45rem;
+  text-transform: uppercase; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.asm-pc-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 0; flex: 1; min-height: 0; }
+.asm-pc-principal { overflow-y: auto; padding: 10px 12px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.asm-pc-lateral {
+  overflow-y: auto; padding: 10px 12px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 0;
+  border-left: 1.5px solid var(--asm-linha); background: rgba(234, 222, 198, .45);
+}
+.asm-pc-lateral h3 { margin: 0 0 4px; border: none; font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: .04em; color: var(--asm-ardosia); }
+.asm-pc-rodada { font-family: var(--asm-fonte-titulo); font-size: 1.05rem; text-transform: uppercase; letter-spacing: .04em; }
+.asm-pc-rodada strong { font-size: 1.8rem; margin-left: 4px; color: var(--asm-vinho-texto); }
+.asm-pc-fases { list-style: none; margin: 6px 0; padding: 0; display: flex; flex-direction: column; gap: 3px; counter-reset: fase; }
+.asm-pc-fases li {
+  counter-increment: fase; font-family: var(--asm-fonte-titulo); font-weight: 600; padding: 3px 8px;
+  border-left: 4px solid var(--asm-linha); color: var(--asm-grafite); background: rgba(255, 255, 255, .4);
+}
+.asm-pc-fases li::before { content: counter(fase) ". "; }
+.asm-pc-fases li.atual { border-left-color: var(--asm-vinho); background: var(--asm-ardosia); color: #fff; }
+.asm-pc-estado { font-family: var(--asm-fonte-titulo); font-weight: 700; text-transform: uppercase; color: var(--asm-grafite); margin: 0; }
+.asm-pc-botoes { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.application.assimilacao .window-content .asm-pc-botoes button { flex: 1 1 auto; height: 32px; }
+.asm-pc-presentes ul, .asm-pc-log ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.asm-pc-presentes li { display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, .6); border: 1px solid var(--asm-linha); padding: 3px 6px; }
+.asm-pc-presentes li > img { width: 34px; height: 34px; object-fit: cover; object-position: top; border: 1px solid #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); cursor: pointer; }
+.asm-pc-presente-textos { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.15; }
+.asm-pc-presente-textos strong { font-family: var(--asm-fonte-titulo); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.asm-pc-presente-textos small { color: var(--asm-grafite); }
+.asm-pc-presentes li.fugiu { opacity: .6; }
+.application.assimilacao .window-content .asm-pc-presentes button.mini { margin-top: 6px; height: 28px; }
+.asm-pc-log li { font-size: .9rem; line-height: 1.25; }
+.asm-pc-log-rodada { font-family: var(--asm-fonte-etiqueta); font-size: .75rem; color: var(--asm-vinho-texto); margin-right: 2px; }
+
+.asm-pc-ameaca { position: relative; border: 1.5px solid var(--asm-partitura-titulo); background: rgba(255, 255, 255, .25); }
+.asm-pc-ameaca-titulo {
+  display: flex; align-items: center; gap: 8px; padding: 4px 10px; background: #b98576; color: #1d1a1b;
+}
+.asm-pc-ameaca-titulo img { width: 34px; height: 34px; object-fit: cover; border: 2px solid rgba(255, 255, 255, .8); background: rgba(255, 255, 255, .3); }
+.asm-pc-ameaca-titulo img[data-action] { cursor: pointer; }
+.asm-pc-ameaca-titulo .asm-pt-tipo { font-size: .8rem; }
+.asm-pc-ameaca-nome { flex: 1; min-width: 0; font-family: var(--asm-fonte-titulo); font-weight: 700; font-size: 1.15rem; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.asm-pc-ameaca-titulo .asm-pt-pool { font-size: 1.05rem; }
+.asm-item-controles.claro { opacity: .85; }
+.asm-pc-ameaca > .asm-pt-subtitulo { margin-top: 0; background: #d9b9ae; font-family: var(--asm-fonte-mao); }
+.asm-pc-ameaca > .asm-saldo { margin: 4px 8px; }
+.asm-pc-ameaca .asm-pt-linha { border-left: none; border-right: none; border-bottom: none; }
+.asm-pc-ameaca.neutralizada .asm-pt-linha:not(.neutralizacao) { display: none; }
+.asm-carimbo.pequeno { top: 6px; right: 120px; font-size: 1.05rem; padding: 0 8px; }
+
+@container partitura (max-width: 760px) {
+  /* Empilhado: bloco simples com uma rolagem só (grade com altura fixa sobrepunha as colunas) */
+  .asm-pc-corpo { display: block; overflow-y: auto; }
+  .asm-pc-principal, .asm-pc-lateral { overflow: visible; min-height: auto; }
+  .asm-pc-lateral { border-left: none; border-top: 1.5px solid var(--asm-linha); }
+  .asm-pt-linha { grid-template-columns: minmax(0, 1fr); }
+  .asm-pt-rotulo { justify-content: flex-start; padding: 4px 10px; }
+}
+
+/* Diálogo de início */
+.asm-presentes-opcoes { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; }
+.asm-presente-opcao img { width: 26px; height: 26px; object-fit: cover; object-position: top; border: 1px solid var(--asm-linha); }
+.asm-dialogo-encerrar { display: flex; flex-direction: column; gap: 6px; }
+
+/* Card: investimento e Conflito */
+.asm-investimentos { list-style: none; margin: 4px 0; padding: 0; font-family: var(--asm-fonte-titulo); }
+.asm-investimentos li { display: flex; align-items: center; gap: 4px; }
+.asm-investimentos img, .asm-investir button img { width: 16px; height: 16px; border: none; vertical-align: -3px; }
+.asm-investir { border-top: 1px dashed var(--asm-linha); margin-top: 6px; padding-top: 4px; }
+.asm-investir-dica { font-size: .8rem; color: var(--asm-grafite); }
+.asm-botoes.destinos { display: flex; flex-wrap: wrap; gap: 4px; }
+.asm-card .asm-botoes.destinos button { flex: 1 1 auto; font-size: .85rem; padding: 2px 6px; line-height: 1.2; height: auto; min-height: 26px; }
+.asm-card .asm-botoes.destinos button.principal { border-color: var(--asm-vinho); }
+.asm-card.conflito-card .asm-card-cabecalho { border-color: var(--asm-partitura-titulo); }
+.asm-card.conflito-card.principal h3 { color: var(--asm-vinho-texto); }
+.asm-card.conflito-card h4 { margin: 6px 0 2px; border: none; font-family: var(--asm-fonte-titulo); font-size: .95rem; text-transform: uppercase; }

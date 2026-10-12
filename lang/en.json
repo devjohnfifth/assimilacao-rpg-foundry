@@ -3,13 +3,16 @@
     "Actor": {
       "infectado": "Infectado(a)",
       "personagem": "Personagem (PdA)",
-      "ameaca": "Ameaça"
+      "ameaca": "Ameaça",
+      "conflito": "Conflito"
     },
     "Item": {
       "caracteristica": "Característica",
       "equipamento": "Equipamento",
       "mutacao": "Mutação",
-      "ativacao": "Ativação"
+      "ativacao": "Ativação",
+      "objetivo": "Objetivo",
+      "condicionante": "Condicionante"
     }
   },
   "ASSIMILACAO": {
@@ -155,7 +158,8 @@
       "cicatrizes": "Cicatrizes emocionais",
       "cicatrizesDica": "abalo, paranoia, cólera…",
       "rotuloAmeaca": "Ameaça (partitura)",
-      "editar": "Editar"
+      "editar": "Editar",
+      "rotuloConflito": "Conflito (partitura)"
     },
     "Saude": {
       "titulo": "Saúde",
@@ -248,7 +252,20 @@
       "cAbateuD": "{n} Pressão abateu Determinação.",
       "gmAbaterD": "Pressão: −1 d",
       "gmReverter": "Reverter ajustes",
-      "investirPool": "O(A) Assimilador(a) investe todos os A e C nas Ativações (B são opcionais)."
+      "investirPool": "O(A) Assimilador(a) investe todos os A e C nas Ativações (B são opcionais).",
+      "investirA": "Investir {n} A:",
+      "investirDica": "(clique: 1 A; Shift: todos)",
+      "faltam": "Faltam {n} A",
+      "levarC": "Levar {n} C para a partitura",
+      "levarCDica": "As C deste teste vão para o saldo do Conflito, para investir nas Ativações ou retirar progresso dos Objetivos.",
+      "cLevadas": "{n} C foram para a partitura.",
+      "cLevadasAviso": "{n} C foram para o saldo do Conflito.",
+      "saldoNaPartitura": "Os símbolos foram para o saldo a investir na partitura.",
+      "aplicarDano": "Aplicar aos alvos marcados",
+      "aplicarDanoDica": "Aplica este dano aos tokens marcados como alvo (T).",
+      "danoAplicadoEm": "Dano aplicado em",
+      "semAlvos": "Marque os alvos no mapa (tecla T) antes de aplicar o dano.",
+      "tagDificuldade": "dificuldade"
     },
     "Avisos": {
       "semAtor": "Personagem da rolagem não encontrado.",
@@ -260,7 +277,9 @@
       "tetoMantidos": "Teto de dados mantidos",
       "tetoMantidosDica": "Via de regra, no máximo 4 dados mantidos por teste (p. 57).",
       "ornamentos": "Ornamentos da ficha",
-      "ornamentosDica": "Mostra os galhos e manchas decorativas nas fichas. Desligue em máquinas mais fracas."
+      "ornamentosDica": "Mostra os galhos e manchas decorativas nas fichas. Desligue em máquinas mais fracas.",
+      "dificuldade": "Dificuldade de jogo",
+      "dificuldadeDica": "⬟ extras rolados em todo pool de Conflito e Ameaça; o(a) Assimilador(a) mantém só a quantidade base (p. 211)."
     },
     "Item": {
       "usos": "Usos",
@@ -492,8 +511,24 @@
         },
         "notas": {
           "label": "Notas"
+        },
+        "dificuldade": {
+          "label": "Dificuldade"
+        },
+        "saldo": {
+          "A": {
+            "label": "A a investir"
+          },
+          "B": {
+            "label": "B a investir"
+          },
+          "C": {
+            "label": "C a investir"
+          }
         }
-      }
+      },
+      "criarConflito": "Virar o próprio Conflito",
+      "criarConflitoDica": "Cria um Conflito com o pool e as Ativações desta Ameaça, a Neutralização como Objetivo Principal e a Fuga (p. 197)."
     },
     "Ativacao": {
       "efeito": "Efeito",
@@ -578,6 +613,273 @@
       "tipoRolagem": "Tipo",
       "tituloRolagem": "Título",
       "tituloRolagemDica": "opcional, ex.: Mordida da lontrariranha"
+    },
+    "Dificuldade": {
+      "exploracao": "Exploração",
+      "sofrimento": "Sofrimento (+1⬟)",
+      "desastre": "Desastre (+2⬟)",
+      "colapso": "Colapso (+3⬟)",
+      "doMundo": "A do mundo ({nome})"
+    },
+    "Intencao": {
+      "hostil": "Hostil",
+      "neutra": "Neutra",
+      "amigavel": "Amigável",
+      "dica": {
+        "hostil": "Hostil: as Ativações de C devem pesar bem mais que as de A.",
+        "neutra": "Neutra: Ativações de A e de C com impacto equivalente.",
+        "amigavel": "Amigável: as Ativações de A devem pesar mais que as de C."
+      }
+    },
+    "Escala": {
+      "simples": "Simples",
+      "climax": "Clímax"
+    },
+    "Fase": {
+      "preparacao": "Preparação",
+      "infectados": "Turno dos Infectados",
+      "assimilador": "Turno do(a) Assimilador(a)",
+      "fim": "Fim da rodada",
+      "encerrado": "Encerrado"
+    },
+    "Conflito": {
+      "conceitoDica": "Conceito: o que está em jogo nesta cena?",
+      "condicionantes": "Condicionantes",
+      "semCondicionantes": "Nenhuma Condicionante.",
+      "novaCondicionante": "Nova Condicionante",
+      "objetivosPrincipais": "Objetivos Principais",
+      "objetivosSecundarios": "Objetivos Secundários",
+      "semObjetivos": "Nenhum Objetivo Principal.",
+      "semSecundarios": "Nenhum Objetivo Secundário.",
+      "novoPrincipal": "Novo Objetivo Principal",
+      "novoSecundario": "Novo Objetivo Secundário",
+      "ameacas": "Ameaças",
+      "semAmeacas": "Nenhuma Ameaça vinculada.",
+      "novaAmeaca": "Nova Ameaça",
+      "arrasteAmeaca": "Arraste uma Ameaça do diretório de atores para vinculá-la.",
+      "desvincular": "Desvincular",
+      "avisoSemPrincipal": "Falta um Objetivo Principal.",
+      "avisoSemFuga": "Não há Objetivo de Fuga.",
+      "duracaoDica": "ex.: um minuto, uma hora",
+      "iniciante": {
+        "infectados": "Infectados",
+        "assimilador": "Assimilador(a)"
+      },
+      "FIELDS": {
+        "conceito": {
+          "label": "Conceito"
+        },
+        "intencao": {
+          "label": "Intenção"
+        },
+        "escala": {
+          "label": "Escala"
+        },
+        "dificuldade": {
+          "label": "Dificuldade"
+        },
+        "duracaoRodada": {
+          "label": "Duração da rodada"
+        },
+        "recompensaXP": {
+          "label": "Experiência sugerida"
+        },
+        "recompensas": {
+          "label": "Recompensas"
+        },
+        "aberta": {
+          "label": "Partitura aberta",
+          "hint": "Os jogadores também veem as Ativações e os pools."
+        },
+        "descricao": {
+          "label": "Descrição"
+        },
+        "notas": {
+          "label": "Notas"
+        },
+        "nivel": {
+          "label": "Nível do grupo"
+        },
+        "infectadosPresentes": {
+          "label": "Infectados presentes"
+        },
+        "pool": {
+          "q": {
+            "label": "Dados ■"
+          },
+          "l": {
+            "label": "Dados ◆"
+          },
+          "p": {
+            "label": "Dados ⬟"
+          }
+        }
+      }
+    },
+    "Objetivo": {
+      "fugaNome": "Fuga",
+      "custoCada": "{a} cada",
+      "custoExtra": "+{a} por Infectado além do primeiro",
+      "custoPor": "+{a} por Infectado",
+      "custoMinimo": "mín. {a} de cada",
+      "metaDica": "Custo com os Infectados presentes agora.",
+      "resumoMeta": "Com {n} Infectado(s) presente(s), o custo fica em {meta} A.",
+      "semAmeaca": "— nenhuma —",
+      "vezesDica": "Vezes que este Objetivo foi concluído",
+      "categoria": {
+        "principal": "Principal",
+        "secundario": "Secundário"
+      },
+      "acumulo": {
+        "coletivo": "Coletivo",
+        "individual": "Individual"
+      },
+      "repeticao": {
+        "unica": "Uma vez",
+        "porInfectado": "Uma vez por Infectado",
+        "multipla": "Repetível"
+      },
+      "FIELDS": {
+        "categoria": {
+          "label": "Categoria",
+          "hint": "Principal encerra o Conflito; Secundário traz um efeito sem encerrar."
+        },
+        "fuga": {
+          "label": "Fuga",
+          "hint": "Quem completa a própria barra sai da cena (e dos cálculos de presentes)."
+        },
+        "custo": {
+          "label": "Custo em A",
+          "base": {
+            "label": "Base"
+          },
+          "porInfectadoExtra": {
+            "label": "+A por Infectado além do primeiro"
+          },
+          "porInfectado": {
+            "label": "+A por Infectado"
+          },
+          "minimoPorInfectado": {
+            "label": "Mínimo de cada Infectado"
+          }
+        },
+        "acumulo": {
+          "label": "Acúmulo",
+          "hint": "Coletivo: todos somam na mesma barra. Individual: cada Infectado acumula o seu (ex.: Fuga, Obter Informações)."
+        },
+        "repeticao": {
+          "label": "Conclusão",
+          "hint": "Uma vez; uma vez por Infectado (cada um completa o seu); ou repetível (a barra recomeça)."
+        },
+        "ameaca": {
+          "label": "Neutralizar a Ameaça",
+          "hint": "Vincula este Objetivo à Neutralização de uma Ameaça: o progresso é o dela."
+        },
+        "restricao": {
+          "label": "Restrição",
+          "hint": "Ex.: os A só valem se 1 B for gasto no mesmo turno."
+        },
+        "recompensa": {
+          "label": "Recompensa"
+        },
+        "progresso": {
+          "total": {
+            "label": "Progresso"
+          }
+        },
+        "conclusoes": {
+          "label": "Conclusões"
+        },
+        "descricao": {
+          "label": "Efeito"
+        }
+      }
+    },
+    "Condicionante": {
+      "ate": "até:",
+      "alternar": "Ligar/desligar",
+      "FIELDS": {
+        "ativa": {
+          "label": "Ativa"
+        },
+        "termino": {
+          "label": "Vale até",
+          "hint": "Ex.: até o painel de controle ser desativado."
+        },
+        "descricao": {
+          "label": "Regra"
+        }
+      }
+    },
+    "Partitura": {
+      "titulo": "Partitura de Conflito",
+      "abrir": "Abrir a partitura da cena",
+      "verPartitura": "Ver a partitura",
+      "nenhumAtivo": "Nenhum Conflito em andamento.",
+      "emAndamento": "Em andamento",
+      "iniciar": "Iniciar Conflito: {nome}",
+      "iniciarBotao": "Iniciar Conflito",
+      "motivo": "Motivo",
+      "motivoDica": "Por que a narrativa vira Conflito agora?",
+      "quemComeca": "Quem começa",
+      "presentes": "Infectados presentes",
+      "semPresentes": "Ninguém na cena.",
+      "iniciado": "Conflito: {nome}",
+      "comeca": "Começa: {lado}.",
+      "rodada": "Rodada",
+      "rodadas": "Durou {n} rodada(s).",
+      "proximaFase": "Próxima fase",
+      "proximaFaseDica": "Avança a fase. Shift: avança mesmo com pontos não investidos.",
+      "rolarPools": "Rolar pools",
+      "rolarTeste": "Rolar teste em Conflito",
+      "comoInvestir": "Depois de escolher os dados, invista os A nos Objetivos pelo card no chat.",
+      "saldo": "A investir",
+      "saldoDica": "Símbolos rolados que ainda precisam ir para as Ativações. Todos os A e C precisam ser investidos; B são opcionais (p. 70).",
+      "saldoPendente": "Ainda há A ou C para investir: {nomes}. Segure Shift para avançar assim mesmo.",
+      "ativacoesPendentes": "Ativações completas esperando o disparo: {nomes}. Segure Shift para avançar assim mesmo.",
+      "aInvestir": "A investir",
+      "prontasParaDisparar": "Ativações prontas",
+      "encerrarBotao": "Encerrar Conflito",
+      "encerrarTitulo": "Encerrar: {nome}",
+      "encerrarPergunta": "Encerrar a cena de Conflito e publicar o resumo no chat?",
+      "encerrarFimDeCena": "Fim de cena para os presentes (os e voltam ao máximo)",
+      "encerrarZerar": "Zerar a partitura para usar de novo",
+      "encerrado": "Fim do Conflito: {nome}",
+      "objetivosConcluidos": "Objetivos concluídos",
+      "ameacasNeutralizadas": "Ameaças neutralizadas",
+      "xpSugerida": "Experiência sugerida: {n}",
+      "neutralizar": "Neutralizar {nome}",
+      "vinculadaA": "Neutralizar:",
+      "concluido": "Concluído",
+      "objetivoConcluido": "Objetivo concluído: {nome}",
+      "principalConcluido": "Objetivo Principal: o Conflito pode ser encerrado.",
+      "secundarioConcluido": "Objetivo Secundário concluído.",
+      "ameacaNeutralizada": "Ameaça neutralizada: {nome}",
+      "fugiu": "{nome} fugiu da cena.",
+      "fugiuTag": "fugiu",
+      "faltaMinimo": "Ainda falta o mínimo de",
+      "retirarDica": "Retirar 1 A de progresso (gasta 1 C do Conflito; Shift: sem gastar)",
+      "semCParaRetirar": "O Conflito não tem C a investir para retirar progresso.",
+      "semGM": "É preciso um(a) GM conectado(a) para registrar o investimento.",
+      "alternarFuga": "Marcar/desmarcar fuga",
+      "removerPresente": "Tirar da cena",
+      "adicionarGrupo": "Adicionar o grupo",
+      "arrasteAtores": "Arraste Infectados, PdAs ou Ameaças do diretório para esta janela.",
+      "agirAntes": "Agir antes",
+      "agirDepois": "Agir depois",
+      "registro": "Registro",
+      "logInicio": "Conflito iniciado.",
+      "logRodada": "Rodada {n}.",
+      "logInvestiu": "{nome} investiu {n} A em {destino}.",
+      "logFugiu": "{nome} fugiu.",
+      "logVoltou": "{nome} voltou à cena.",
+      "logConcluiu": "{destino} concluído.",
+      "logConcluiuVez": "{destino} concluído ({n}×).",
+      "logNeutralizada": "{nome} neutralizada.",
+      "logRetirou": "1 C retirou 1 A de {destino}.",
+      "logRolou": "{nome} rolou: {A} A, {B} B, {C} C.",
+      "logC": "{n} C de {nome} foram para a partitura.",
+      "logDisparou": "{dono} disparou {nome}."
     }
   }
 }

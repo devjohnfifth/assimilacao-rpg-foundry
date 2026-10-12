@@ -1,4 +1,5 @@
 import { DadoSimbolo, htmlDaFace } from "./terms.mjs";
+import { conflitoAtivo, destinosPara } from "../conflito/motor.mjs";
 
 /**
  * Rolagem do Assimilação: guarda o contexto do teste, a escolha dos dados mantidos
@@ -55,7 +56,10 @@ export class RolagemAssimilacao extends foundry.dice.Roll {
   get limitesManter() {
     const n = this.dadosSimbolo.length;
     if ( this.mantemTodos ) return { min: n, max: n };
-    const teto = game.settings?.get("assimilacao", "tetoMantidos") ?? CONFIG.ASSIMILACAO.TETO_MANTIDOS;
+    // O teto de 4 mantidos vale para os testes dos Infectados; pools com dificuldade mantêm a quantidade base.
+    const teto = ["acao", "assimilada"].includes(this.options.tipo)
+      ? (game.settings?.get("assimilacao", "tetoMantidos") ?? CONFIG.ASSIMILACAO.TETO_MANTIDOS)
+      : Infinity;
     const max = Math.min(n, this.options.manterMax ?? 1, teto || Infinity);
     const min = Math.min(max, Math.max(1, this.options.manterMin ?? 1));
     return { min, max };
@@ -127,7 +131,8 @@ export class RolagemAssimilacao extends foundry.dice.Roll {
         const s = RolagemAssimilacao.somar(escolhidos.map(i => dados[i]));
         const cRestante = anula ? Math.max(0, s.C - s.B) : s.C;
         const bLivre = anula ? Math.max(0, s.B - s.C) : s.B;
-        const chave = [s.A, -cRestante, bLivre, -k];
+        // Pool do(a) Assimilador(a) com dificuldade: mais C primeiro, depois mais símbolos (seção 3.8).
+        const chave = (this.options.tipo === "pool") ? [s.C, s.A + s.B, -k] : [s.A, -cRestante, bLivre, -k];
         if ( !melhorChave || comparar(chave, melhorChave) > 0 ) {
           melhorChave = chave;
           melhor = [...escolhidos];
@@ -210,7 +215,38 @@ export class RolagemAssimilacao extends foundry.dice.Roll {
       isGM,
       gmPodeAbaterD: isGM && travado && ["acao", "assimilada"].includes(o.tipo) && res.C > (o.ajustes.cDeterminacao ?? 0) && !!o.ator?.uuid,
       ehPool: o.tipo === "pool",
-      simbolos: CONFIG.ASSIMILACAO.SIMBOLOS
+      saldoAplicado: !!o.saldoAplicado,
+      ...this.#contextoConflito(travado, ehDono, res, isGM),
+      simbolos: CONFIG.ASSIMILACAO.SIMBOLOS,
+      podeAplicarDano: isGM && (o.tipo === "dano"),
+      aplicadoEm: (o.aplicadoEm ?? []).join(", ")
     });
+  }
+
+  /** Investimento dos A em Objetivos e C para a partitura, quando há um Conflito em andamento. */
+  #contextoConflito(travado, ehDono, res, isGM) {
+    const o = this.options;
+    const investimentos = o.investimentos ?? [];
+    const investidos = investimentos.reduce((t, i) => t + i.A, 0);
+    const vazio = { investimentos, investidos };
+    if ( !["acao", "assimilada"].includes(o.tipo) || !travado ) return vazio;
+    const conflito = conflitoAtivo();
+    if ( !conflito ) return vazio;
+    const ator = o.ator?.uuid ? fromUuidSync(o.ator.uuid) : null;
+    const atorId = ator?.id ?? null;
+    const naCena = !atorId || !conflito.system.cena.presentes.length || conflito.system.naCena.includes(atorId);
+    const restamA = Math.max(0, res.A - investidos);
+    const destinos = (ehDono && naCena && restamA) ? destinosPara(conflito, atorId) : [];
+    const cRestantes = Math.max(0, res.C - (o.cLevadas ?? 0) - (o.ajustes?.cDeterminacao ?? 0));
+    return {
+      investimentos, investidos,
+      conflitoNome: conflito.name,
+      restamA,
+      destinos,
+      podeInvestir: destinos.length > 0,
+      gmLevarC: isGM && (cRestantes > 0),
+      cRestantes,
+      cLevadas: o.cLevadas ?? 0
+    };
   }
 }

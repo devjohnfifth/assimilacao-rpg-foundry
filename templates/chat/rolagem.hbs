@@ -50,6 +50,12 @@
     <span class="asm-resultado-num">{{totalDano}}</span>
     <span>{{localize "ASSIMILACAO.Rolagem.pontosDano"}}</span>
   </div>
+  {{#if aplicadoEm}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.danoAplicadoEm"}}: {{aplicadoEm}}</p>{{/if}}
+  {{#if podeAplicarDano}}
+  <div class="asm-botoes gm">
+    <button type="button" data-acao="gm-aplicar-dano" data-tooltip="{{localize "ASSIMILACAO.Rolagem.aplicarDanoDica"}}"><i class="fa-solid fa-crosshairs"></i> {{localize "ASSIMILACAO.Rolagem.aplicarDano"}}</button>
+  </div>
+  {{/if}}
   {{else}}
   <div class="asm-resultado">
     <div class="asm-res-item A" data-tooltip="{{localize "ASSIMILACAO.Simbolo.A"}}">
@@ -82,15 +88,37 @@
   </div>
   {{/if}}
 
+  {{#if investimentos.length}}
+  <ul class="asm-investimentos">
+    {{#each investimentos}}<li><img src="{{@root.simbolos.A.icone}}" alt="A"> {{A}} → {{rotulo}}</li>{{/each}}
+  </ul>
+  {{/if}}
+  {{#if podeInvestir}}
+  <div class="asm-investir">
+    <p class="asm-nota"><strong>{{localize "ASSIMILACAO.Rolagem.investirA" n=restamA}}</strong> <span class="asm-investir-dica">{{localize "ASSIMILACAO.Rolagem.investirDica"}}</span></p>
+    <div class="asm-botoes destinos">
+      {{#each destinos}}
+      <button type="button" data-acao="investir" data-destino="{{destino}}" class="{{#if principal}}principal{{/if}}"
+              data-tooltip="{{localize "ASSIMILACAO.Rolagem.faltam" n=faltam}}">
+        <img src="{{@root.simbolos.A.icone}}" alt="A"> {{rotulo}}
+      </button>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
   {{#if ehPool}}
   <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Rolagem.investirPool"}}</p>
+  {{#if saldoAplicado}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.saldoNaPartitura"}}</p>{{/if}}
   {{else if res.C}}
   <p class="asm-nota manuscrita">{{localize "ASSIMILACAO.Rolagem.cParaGM" n=res.C}}{{#if consequencia}} <span class="asm-consequencia">({{localize "ASSIMILACAO.Rolagem.escala"}}: {{consequencia}})</span>{{/if}}</p>
   {{/if}}
   {{#if ajustes.cDeterminacao}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.cAbateuD" n=ajustes.cDeterminacao}}</p>{{/if}}
-  {{#if gmPodeAbaterD}}
+  {{#if cLevadas}}<p class="asm-nota">{{localize "ASSIMILACAO.Rolagem.cLevadas" n=cLevadas}}</p>{{/if}}
+  {{#if (or gmPodeAbaterD gmLevarC)}}
   <div class="asm-botoes gm">
-    <button type="button" data-acao="gm-c-det"><i class="fa-solid fa-heart-crack"></i> {{localize "ASSIMILACAO.Rolagem.gmAbaterD"}}</button>
+    {{#if gmPodeAbaterD}}<button type="button" data-acao="gm-c-det"><i class="fa-solid fa-heart-crack"></i> {{localize "ASSIMILACAO.Rolagem.gmAbaterD"}}</button>{{/if}}
+    {{#if gmLevarC}}<button type="button" data-acao="gm-c-partitura" data-tooltip="{{localize "ASSIMILACAO.Rolagem.levarCDica"}}"><i class="fa-solid fa-scroll"></i> {{localize "ASSIMILACAO.Rolagem.levarC" n=cRestantes}}</button>{{/if}}
   </div>
   {{/if}}
   {{#if isGM}}{{#if (or ajustes.bAnulaC ajustes.bIgnoraPen ajustes.cDeterminacao)}}

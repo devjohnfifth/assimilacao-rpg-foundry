@@ -1,0 +1,245 @@
+{{#*inline "saldoChips"}}
+<div class="asm-saldo" data-tooltip="{{localize "ASSIMILACAO.Partitura.saldoDica"}}">
+  <span class="asm-saldo-rotulo">{{localize "ASSIMILACAO.Partitura.saldo"}}</span>
+  {{#each saldo}}<span class="asm-saldo-item simbolo-{{s}}"><img src="{{icone}}" alt="{{s}}"> {{n}}</span>{{/each}}
+</div>
+{{/inline}}
+
+{{#*inline "objetivo"}}
+<article class="asm-pt-objetivo {{#if completo}}completo{{/if}} {{#if system.fuga}}fuga{{/if}}" data-item-id="{{id}}">
+  <div class="asm-pt-ativ-cab">
+    <span class="asm-pt-obj-nome" {{#if @root.isGM}}data-action="editarItem"{{/if}}>{{name}}</span>
+    <span class="asm-pt-custo-texto">{{custoTexto}}</span>
+    {{#if system.fuga}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.FIELDS.fuga.label"}}</span>{{/if}}
+    {{#if individual}}<span class="asm-tag">{{localize "ASSIMILACAO.Objetivo.acumulo.individual"}}</span>{{/if}}
+    {{#if (eq system.repeticao "multipla")}}<span class="asm-tag disparos" data-tooltip="{{localize "ASSIMILACAO.Objetivo.vezesDica"}}">×{{system.conclusoes}}</span>{{/if}}
+    {{#if ameaca}}<span class="asm-tag">{{localize "ASSIMILACAO.Partitura.vinculadaA"}} {{ameaca.nome}}</span>{{/if}}
+    {{#unless individual}}<span class="asm-pt-meta">{{atual}}/{{meta}} A</span>{{/unless}}
+    {{#if completo}}<span class="asm-selo-concluido">{{localize "ASSIMILACAO.Partitura.concluido"}}</span>{{/if}}
+    {{#if @root.isGM}}{{#unless individual}}{{#unless ameaca}}
+    <span class="asm-item-controles">
+      <a data-action="retirarProgresso" data-tooltip="{{localize "ASSIMILACAO.Partitura.retirarDica"}}" aria-label="{{localize "ASSIMILACAO.Partitura.retirarDica"}}"><i class="fa-solid fa-minus"></i></a>
+    </span>
+    {{/unless}}{{/unless}}{{/if}}
+  </div>
+  {{#unless individual}}
+    {{#if longa}}
+    <span class="asm-barra-neutra"><span style="width: {{pct}}%"></span></span>
+    {{else}}
+    <span class="asm-casas">
+      {{#each casas}}<span class="asm-casa casa-A {{#if cheia}}cheia{{/if}}" {{#if @root.isGM}}data-action="casaObjetivo"{{/if}} data-i="{{i}}" role="button" aria-pressed="{{cheia}}"><img src="{{icone}}" alt="A"></span>{{/each}}
+    </span>
+    {{/if}}
+    {{#if contribuicoes.length}}
+    <div class="asm-contribuicoes">
+      {{#each contribuicoes}}<span class="asm-contrib" data-tooltip="{{nome}}"><img src="{{img}}" alt="{{nome}}"> {{n}}</span>{{/each}}
+    </div>
+    {{/if}}
+    {{#if faltamMinimo}}<p class="asm-nota aviso">{{localize "ASSIMILACAO.Partitura.faltaMinimo"}}: {{faltamMinimo}}</p>{{/if}}
+  {{else}}
+    <ul class="asm-obj-linhas">
+      {{#each linhas}}
+      <li data-ator="{{atorId}}" class="{{#if completo}}completo{{/if}} {{#if fugiu}}fugiu{{/if}}">
+        <img src="{{img}}" alt="">
+        <span class="asm-obj-linha-nome">{{nome}}</span>
+        {{#if ../longa}}
+        <span class="asm-barra-neutra"><span style="width: {{pct}}%"></span></span>
+        {{else}}
+        <span class="asm-casas">
+          {{#each casas}}<span class="asm-casa casa-A {{#if cheia}}cheia{{/if}}" {{#if @root.isGM}}data-action="casaObjetivoInd"{{/if}} data-i="{{i}}" role="button" aria-pressed="{{cheia}}"><img src="{{icone}}" alt="A"></span>{{/each}}
+        </span>
+        {{/if}}
+        <span class="asm-pt-meta">{{n}}/{{../meta}}</span>
+        {{#if @root.isGM}}<a class="asm-mini-controle" data-action="retirarProgresso" data-tooltip="{{localize "ASSIMILACAO.Partitura.retirarDica"}}" aria-label="{{localize "ASSIMILACAO.Partitura.retirarDica"}}"><i class="fa-solid fa-minus"></i></a>{{/if}}
+      </li>
+      {{else}}
+      <li class="asm-vazio">{{localize "ASSIMILACAO.Partitura.semPresentes"}}</li>
+      {{/each}}
+    </ul>
+  {{/unless}}
+  {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
+  {{#if system.restricao}}<p class="asm-nota"><strong>{{localize "ASSIMILACAO.Objetivo.FIELDS.restricao.label"}}:</strong> {{system.restricao}}</p>{{/if}}
+</article>
+{{/inline}}
+
+<div class="asm-pc {{#if isGM}}gm{{/if}}">
+  <header class="asm-pt-titulo">
+    <img class="asm-pt-retrato" src="{{c.img}}" alt="">
+    <span class="asm-pt-tipo">{{localize "TYPES.Actor.conflito"}}</span>
+    <span class="asm-pt-nome-texto">{{c.name}}</span>
+    {{#if isGM}}<span class="asm-pt-pool" data-tooltip="{{localize "ASSIMILACAO.Ameaca.valorDica"}}">{{poolTexto}}</span>{{/if}}
+  </header>
+  {{#if conceito}}<div class="asm-pt-subtitulo"><span>{{conceito}}</span></div>{{/if}}
+
+  <div class="asm-pc-corpo">
+    <div class="asm-pc-principal">
+
+      {{#if condicionantes.length}}
+      <div class="asm-pt-linha condicionantes">
+        <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.condicionantes"}}</div>
+        <div class="asm-pt-conteudo">
+          {{#each condicionantes}}
+          <article class="asm-pt-condicionante {{#unless ativa}}inativa{{/unless}}" data-item-id="{{id}}">
+            <div class="asm-pt-ativ-cab">
+              <span class="asm-pt-ativ-nome" {{#if @root.isGM}}data-action="editarItem"{{/if}}>{{name}}</span>
+              {{#if termino}}<span class="asm-tag" data-tooltip="{{localize "ASSIMILACAO.Condicionante.FIELDS.termino.label"}}"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> {{termino}}</span>{{/if}}
+            </div>
+            {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
+          </article>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if verAtivacoes}}
+      <div class="asm-pt-linha" data-dono="{{c.id}}">
+        <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Ameaca.ativacoesConflito"}}</div>
+        <div class="asm-pt-conteudo">
+          {{#if isGM}}{{#if temSaldo}}{{> saldoChips saldo=saldo}}{{/if}}{{/if}}
+          {{#each ativacoes}}
+          {{> ativacao this dono=@root.c.id editavel=@root.isGM apagavel=false}}
+          {{else}}
+          <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Ameaca.semAtivacoes"}}</p>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      <div class="asm-pt-linha objetivos">
+        <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.objetivosPrincipais"}}</div>
+        <div class="asm-pt-conteudo">
+          {{#each principais}}{{> objetivo}}{{else}}<p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Conflito.semObjetivos"}}</p>{{/each}}
+        </div>
+      </div>
+
+      {{#if secundarios.length}}
+      <div class="asm-pt-linha objetivos secundarios">
+        <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Conflito.objetivosSecundarios"}}</div>
+        <div class="asm-pt-conteudo">
+          {{#each secundarios}}{{> objetivo}}{{/each}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{#each ameacas}}
+      <section class="asm-pc-ameaca {{#if neutralizada}}neutralizada{{/if}}" data-ameaca="{{id}}" data-dono="{{id}}">
+        <header class="asm-pc-ameaca-titulo">
+          <img src="{{img}}" alt="" data-uuid="{{uuid}}" {{#if @root.isGM}}data-action="abrirFicha"{{/if}}>
+          <span class="asm-pt-tipo">{{localize "TYPES.Actor.ameaca"}}</span>
+          <span class="asm-pc-ameaca-nome">{{name}}</span>
+          {{#if @root.isGM}}
+          <span class="asm-pt-pool">{{poolTexto}}</span>
+          <span class="asm-item-controles claro">
+            {{#unless neutralizada}}<a data-action="rolarPool" data-tooltip="{{localize "ASSIMILACAO.Ameaca.rolarPool"}}" aria-label="{{localize "ASSIMILACAO.Ameaca.rolarPool"}}"><i class="fa-solid fa-dice"></i></a>{{/unless}}
+            {{#unless primeiro}}<a data-action="moverAmeaca" data-passo="-1" data-tooltip="{{localize "ASSIMILACAO.Partitura.agirAntes"}}" aria-label="{{localize "ASSIMILACAO.Partitura.agirAntes"}}"><i class="fa-solid fa-arrow-up"></i></a>{{/unless}}
+            {{#unless ultimo}}<a data-action="moverAmeaca" data-passo="1" data-tooltip="{{localize "ASSIMILACAO.Partitura.agirDepois"}}" aria-label="{{localize "ASSIMILACAO.Partitura.agirDepois"}}"><i class="fa-solid fa-arrow-down"></i></a>{{/unless}}
+          </span>
+          {{/if}}
+        </header>
+        {{#if interesses}}<div class="asm-pt-subtitulo"><span>{{interesses}}</span></div>{{/if}}
+        {{#if neutralizada}}<div class="asm-carimbo pequeno">{{localize "ASSIMILACAO.Ameaca.neutralizada"}}</div>{{/if}}
+        {{#if @root.isGM}}{{#if temSaldo}}{{> saldoChips saldo=saldo}}{{/if}}{{/if}}
+        {{#if ativacoes.length}}
+        <div class="asm-pt-linha">
+          <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Ameaca.ativacoes"}}</div>
+          <div class="asm-pt-conteudo">
+            {{#each ativacoes}}{{> ativacao this dono=../id editavel=@root.isGM apagavel=false}}{{/each}}
+          </div>
+        </div>
+        {{/if}}
+        <div class="asm-pt-linha neutralizacao">
+          <div class="asm-pt-rotulo">{{localize "ASSIMILACAO.Ameaca.neutralizacao"}}</div>
+          <div class="asm-pt-conteudo">
+            <div class="asm-pt-ativ-cab">
+              {{#if neutralizacao.longa}}
+              <span class="asm-barra-neutra"><span style="width: {{neutralizacao.pct}}%"></span></span>
+              {{else}}
+              <span class="asm-casas">
+                {{#each neutralizacao.casas}}<span class="asm-casa casa-A {{#if cheia}}cheia{{/if}}" {{#if @root.isGM}}data-action="casaNeutralizacao"{{/if}} data-i="{{i}}" role="button" aria-pressed="{{cheia}}"><img src="{{icone}}" alt="A"></span>{{/each}}
+              </span>
+              {{/if}}
+              <span class="asm-pt-meta">{{neutralizacao.value}}/{{neutralizacao.max}} A</span>
+            </div>
+            {{#if neutralizacao.especial}}<p class="asm-nota">{{neutralizacao.especial}}</p>{{/if}}
+          </div>
+        </div>
+      </section>
+      {{/each}}
+    </div>
+
+    <aside class="asm-pc-lateral">
+      <section class="asm-pc-cena">
+        {{#if ativa}}
+        <div class="asm-pc-rodada"><span>{{localize "ASSIMILACAO.Partitura.rodada"}}</span> <strong>{{cena.rodada}}</strong></div>
+        <ol class="asm-pc-fases">
+          {{#each ordem}}<li class="{{#if atual}}atual{{/if}}" {{#if atual}}aria-current="step"{{/if}}>{{rotulo}}</li>{{/each}}
+        </ol>
+        {{else}}
+        <p class="asm-pc-estado">{{faseRotulo}}</p>
+        {{/if}}
+        {{#if cena.motivo}}<p class="asm-card-intencao">“{{cena.motivo}}”</p>{{/if}}
+        <p class="asm-nota">
+          {{localize "ASSIMILACAO.Conflito.FIELDS.dificuldade.label"}}: <strong>{{dificuldade}}</strong>
+          {{#if isGM}} · {{localize "ASSIMILACAO.Conflito.FIELDS.intencao.label"}}: <strong>{{intencao}}</strong>{{/if}}
+          {{#if sys.duracaoRodada}} · {{localize "ASSIMILACAO.Conflito.FIELDS.duracaoRodada.label"}}: {{sys.duracaoRodada}}{{/if}}
+        </p>
+        {{#if isGM}}
+          {{#if ativa}}
+          <div class="asm-pc-botoes">
+            <button type="button" class="primario" data-action="proximaFase" data-tooltip="{{localize "ASSIMILACAO.Partitura.proximaFaseDica"}}"><i class="fa-solid fa-forward-step"></i> {{localize "ASSIMILACAO.Partitura.proximaFase"}}</button>
+            {{#if emAssimilador}}<button type="button" data-action="rolarPools"><i class="fa-solid fa-dice"></i> {{localize "ASSIMILACAO.Partitura.rolarPools"}}</button>{{/if}}
+            <button type="button" data-action="encerrar"><i class="fa-solid fa-flag-checkered"></i> {{localize "ASSIMILACAO.Partitura.encerrarBotao"}}</button>
+          </div>
+          {{#if pendentes}}<p class="asm-nota aviso"><i class="fa-solid fa-triangle-exclamation"></i> {{localize "ASSIMILACAO.Partitura.aInvestir"}}: {{pendentes}}</p>{{/if}}
+          {{#if prontas}}<p class="asm-nota aviso"><i class="fa-solid fa-bolt"></i> {{localize "ASSIMILACAO.Partitura.prontasParaDisparar"}}: {{prontas}}</p>{{/if}}
+          {{else}}
+          <div class="asm-pc-botoes">
+            <button type="button" class="primario" data-action="iniciar"><i class="fa-solid fa-play"></i> {{localize "ASSIMILACAO.Partitura.iniciarBotao"}}</button>
+          </div>
+          {{/if}}
+        {{/if}}
+        {{#if podeTestar}}
+        <div class="asm-pc-botoes">
+          <button type="button" class="primario" data-action="abrirTeste"><i class="fa-solid fa-dice"></i> {{localize "ASSIMILACAO.Partitura.rolarTeste"}}</button>
+        </div>
+        <p class="asm-nota">{{localize "ASSIMILACAO.Partitura.comoInvestir"}}</p>
+        {{/if}}
+      </section>
+
+      <section class="asm-pc-presentes">
+        <h3>{{localize "ASSIMILACAO.Partitura.presentes"}} <small>({{nPresentes}})</small></h3>
+        <ul>
+          {{#each presentes}}
+          <li data-ator="{{id}}" data-uuid="{{uuid}}" class="{{#if fugiu}}fugiu{{/if}}">
+            <img src="{{img}}" alt="" data-action="abrirFicha">
+            <div class="asm-pc-presente-textos">
+              <strong>{{nome}}</strong>
+              <small>{{#if saude}}{{localize "ASSIMILACAO.Saude.titulo"}} {{saude}} · {{d}} d · {{e}} e{{/if}}</small>
+            </div>
+            {{#if fugiu}}<span class="asm-tag">{{localize "ASSIMILACAO.Partitura.fugiuTag"}}</span>{{/if}}
+            {{#if @root.isGM}}
+            <span class="asm-item-controles">
+              <a data-action="alternarFuga" data-tooltip="{{localize "ASSIMILACAO.Partitura.alternarFuga"}}" aria-label="{{localize "ASSIMILACAO.Partitura.alternarFuga"}}"><i class="fa-solid fa-person-running"></i></a>
+              <a data-action="removerPresente" data-tooltip="{{localize "ASSIMILACAO.Partitura.removerPresente"}}" aria-label="{{localize "ASSIMILACAO.Partitura.removerPresente"}}"><i class="fa-solid fa-xmark"></i></a>
+            </span>
+            {{/if}}
+          </li>
+          {{else}}
+          <li class="asm-vazio">{{localize "ASSIMILACAO.Partitura.semPresentes"}}</li>
+          {{/each}}
+        </ul>
+        {{#if isGM}}
+        <button type="button" class="mini" data-action="adicionarGrupo"><i class="fa-solid fa-users"></i> {{localize "ASSIMILACAO.Partitura.adicionarGrupo"}}</button>
+        <p class="asm-nota">{{localize "ASSIMILACAO.Partitura.arrasteAtores"}}</p>
+        {{/if}}
+      </section>
+
+      <section class="asm-pc-log">
+        <h3>{{localize "ASSIMILACAO.Partitura.registro"}}</h3>
+        <ol>
+          {{#each log}}<li><span class="asm-pc-log-rodada">R{{rodada}}</span> {{texto}}</li>{{else}}<li class="asm-vazio">—</li>{{/each}}
+        </ol>
+      </section>
+    </aside>
+  </div>
+</div>

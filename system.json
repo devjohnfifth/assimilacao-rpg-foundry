@@ -1,8 +1,8 @@
 {
   "id": "assimilacao",
   "title": "Assimilação RPG",
-  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG (Editora Assimilar): dados de símbolos ■◆⬟, ficha de Infectado(a) no visual do livro, Personagens do(a) Assimilador(a), Ameaças com Ativações no visual das partituras, Cabo de Guerra, Saúde, Teste de Ação com escolha de dados mantidos e macros prontas. Baralhos, Partitura de Conflito completa e Refúgios em construção.",
-  "version": "0.2.0",
+  "description": "Sistema não-oficial para Foundry VTT de Assimilação RPG (Editora Assimilar): dados de símbolos ■◆⬟, ficha de Infectado(a) no visual do livro, Personagens do(a) Assimilador(a), Ameaças e a Partitura de Conflito completa (Objetivos, Condicionantes, rodadas e fases, investimento dos A pelo card), Cabo de Guerra, Saúde, Teste de Ação com escolha de dados mantidos e macros prontas. Baralhos e Refúgios em construção.",
+  "version": "0.3.0",
   "compatibility": {
     "minimum": "13",
     "verified": "14.367"
@@ -81,6 +81,12 @@
           "descricao",
           "notas"
         ]
+      },
+      "conflito": {
+        "htmlFields": [
+          "descricao",
+          "notas"
+        ]
       }
     },
     "Item": {
@@ -100,6 +106,16 @@
         ]
       },
       "ativacao": {
+        "htmlFields": [
+          "descricao"
+        ]
+      },
+      "objetivo": {
+        "htmlFields": [
+          "descricao"
+        ]
+      },
+      "condicionante": {
         "htmlFields": [
           "descricao"
         ]

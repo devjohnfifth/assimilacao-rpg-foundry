@@ -6,6 +6,12 @@
     <input class="asm-pt-nome" type="text" name="name" value="{{actor.name}}" aria-label="{{localize "ASSIMILACAO.Ficha.nome"}}">
     <span class="asm-pt-pool" data-tooltip="{{localize "ASSIMILACAO.Ameaca.valorDica"}}">{{poolTexto}}</span>
   </header>
+  {{#if temSaldo}}
+  <div class="asm-saldo" data-tooltip="{{localize "ASSIMILACAO.Partitura.saldoDica"}}">
+    <span class="asm-saldo-rotulo">{{localize "ASSIMILACAO.Partitura.saldo"}}</span>
+    {{#each saldo}}<span class="asm-saldo-item simbolo-{{s}}"><img src="{{icone}}" alt="{{s}}"> {{n}}</span>{{/each}}
+  </div>
+  {{/if}}
   <div class="asm-pt-subtitulo">
     <input type="text" name="system.interesses" value="{{source.system.interesses}}" placeholder="{{localize "ASSIMILACAO.Ameaca.interessesDica"}}">
   </div>
@@ -16,33 +22,7 @@
     <div class="asm-pt-rotulo">{{#if sys.ehOProprioConflito}}{{localize "ASSIMILACAO.Ameaca.ativacoesConflito"}}{{else}}{{localize "ASSIMILACAO.Ameaca.ativacoes"}}{{/if}}</div>
     <div class="asm-pt-conteudo">
       {{#each ativacoes}}
-      <article class="asm-pt-ativacao {{#if completa}}completa{{/if}} {{#if esgotada}}esgotada{{/if}}" data-item-id="{{id}}">
-        <div class="asm-pt-ativ-cab">
-          <span class="asm-casas">
-            {{#each casas}}
-            <span class="asm-casa casa-{{s}} {{#if cheia}}cheia{{/if}}" {{#if @root.editable}}data-action="casaAtivacao"{{/if}}
-                  data-s="{{s}}" data-i="{{i}}" role="button" aria-pressed="{{cheia}}"
-                  data-tooltip="{{localize (concat "ASSIMILACAO.Simbolo." s)}} {{i}}"><img src="{{icone}}" alt="{{s}}"></span>
-            {{/each}}
-            {{#if semCusto}}<span class="asm-nota">{{localize "ASSIMILACAO.Ativacao.semCusto"}}</span>{{/if}}
-          </span>
-          <span class="asm-pt-ativ-nome" data-action="editarItem">{{name}}</span>
-          {{#if system.unicaVez}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.unicaVez.label"}}</span>{{/if}}
-          {{#if system.pagamentoIntegral}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.pagamentoIntegral.label"}}</span>{{/if}}
-          {{#if system.requerMunicao}}<span class="asm-tag">{{localize "ASSIMILACAO.Ativacao.FIELDS.requerMunicao.label"}}</span>{{/if}}
-          {{#if system.disparos}}<span class="asm-tag disparos" data-tooltip="{{localize "ASSIMILACAO.Ativacao.disparosDica"}}">×{{system.disparos}}</span>{{/if}}
-          {{#if @root.editable}}
-          <span class="asm-item-controles">
-            <a data-action="dispararAtivacao" class="disparar {{#if completa}}pronta{{/if}}" data-tooltip="{{localize "ASSIMILACAO.Ativacao.dispararDica"}}"><i class="fa-solid fa-bolt"></i></a>
-            <a data-action="limparAtivacao" data-tooltip="{{localize "ASSIMILACAO.Ativacao.limpar"}}"><i class="fa-solid fa-eraser"></i></a>
-            <a data-action="editarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.editar"}}"><i class="fa-solid fa-pen"></i></a>
-            <a data-action="apagarItem" data-tooltip="{{localize "ASSIMILACAO.Ficha.remover"}}"><i class="fa-solid fa-trash"></i></a>
-          </span>
-          {{/if}}
-        </div>
-        {{#if efeito}}<div class="asm-pt-ativ-efeito">{{{efeito}}}</div>{{/if}}
-        {{#if system.dano}}<div class="asm-pt-ativ-dano"><i class="fa-solid fa-droplet"></i> {{localize "ASSIMILACAO.Ativacao.FIELDS.dano.label"}}: <strong>{{system.dano}}</strong>{{#if system.alvos}} · {{system.alvos}}{{/if}}</div>{{/if}}
-      </article>
+      {{> ativacao this dono=@root.actor.id editavel=@root.editable apagavel=true}}
       {{else}}
       <p class="asm-vazio manuscrita">{{localize "ASSIMILACAO.Ameaca.semAtivacoes"}}</p>
       {{/each}}
@@ -95,6 +75,8 @@
         <input type="number" name="system.infectadosPresentes" value="{{source.system.infectadosPresentes}}" min="1" max="12" step="1"></label>
       <label class="asm-check"><input type="checkbox" name="system.ehOProprioConflito" {{checked source.system.ehOProprioConflito}}>
         {{localize "ASSIMILACAO.Ameaca.FIELDS.ehOProprioConflito.label"}}</label>
+      <label>{{localize "ASSIMILACAO.Conflito.FIELDS.dificuldade.label"}}
+        <select name="system.dificuldade">{{selectOptions dificuldades selected=source.system.dificuldade blank=dificuldadeMundo}}</select></label>
       <span class="asm-pt-valor" data-tooltip="{{localize "ASSIMILACAO.Ameaca.valorDica"}}">
         {{localize "ASSIMILACAO.Ameaca.valor"}} <strong>{{sys.valorPool}}</strong> ·
         {{localize "ASSIMILACAO.Ameaca.recomendado"}} <strong>{{sys.recomendado}}</strong>
@@ -103,6 +85,11 @@
     </div>
     {{#if avisos.length}}
     <ul class="asm-pt-avisos">{{#each avisos}}<li>{{this}}</li>{{/each}}</ul>
+    {{/if}}
+    {{#if isGM}}
+    <div class="asm-pt-acoes">
+      <button type="button" data-action="criarConflito" data-tooltip="{{localize "ASSIMILACAO.Ameaca.criarConflitoDica"}}"><i class="fa-solid fa-scroll"></i> {{localize "ASSIMILACAO.Ameaca.criarConflito"}}</button>
+    </div>
     {{/if}}
   </footer>
 </section>
