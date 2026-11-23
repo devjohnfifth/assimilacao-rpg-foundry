@@ -115,8 +115,11 @@ await game.assimilacao.conflito.encerrar(c, { fimDeCena: true });
    dispare as completas. A fase só avança com todos os A e C investidos (Shift força).
 5. **Encerrar Conflito** publica o resumo, faz o fim de cena dos presentes e, se pedido, zera a partitura.
 
-## Direitos autorais
+## Licença e direitos autorais
 
-Assimilação RPG, seus textos, cartas, ilustrações e o nome pertencem à Editora Assimilar.
-Este sistema não inclui textos nem artes do livro; os ícones dos símbolos são desenhos próprios
-e as fontes são livres (licenças em `assets/fonts/`). Uso pessoal de mesa, sem fins comerciais.
+O código deste sistema (JavaScript, templates, estilos e scripts) está sob a [licença MIT](LICENSE).
+
+A licença não cobre o jogo: Assimilação RPG, seus textos, cartas, ilustrações e o nome pertencem
+à Editora Assimilar. Este sistema não inclui textos nem artes do livro; os ícones dos símbolos são
+desenhos próprios e as fontes são livres, cada uma com a sua licença em `assets/fonts/`.
+É um projeto de fã, sem fins comerciais.
