@@ -1,5 +1,12 @@
 # Assimilação RPG — sistema para Foundry VTT (não-oficial)
 
+![Ficha de Infectado, Ameaça e Partitura de Conflito no Foundry VTT](.github/readme/assimilacao.jpg)
+
+> **English:** unofficial Foundry VTT game system for *Assimilação RPG* (Editora Assimilar):
+> custom symbol dice, character sheets that mirror the printed book, threat and conflict
+> trackers that the GM and players run together in real time, a macro compendium and
+> automated tests. The game content is in Brazilian Portuguese.
+
 Sistema em desenvolvimento para jogar **Assimilação RPG** (Editora Assimilar) no Foundry VTT v13+ (testado na v14).
 A especificação completa, capítulo por capítulo, está em [`docs/`](docs/).
 
